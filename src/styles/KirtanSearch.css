@@ -27,7 +27,7 @@
   align-items: center;
   padding: 20px;
   border-bottom: 2px solid #f0f0f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
   color: white;
 }
 
@@ -43,19 +43,23 @@
 }
 
 .kirtan-search-input {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 25px;
-  width: 300px;
+  padding: 12px 25px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 50px;
+  width: 350px;
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.9);
+  background: white;
   color: #333;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .kirtan-search-input:focus {
   outline: none;
   background: white;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+  width: 380px;
+  box-shadow: 0 4px 12px rgba(28, 181, 224, 0.2);
+  border-color: #1CB5E0;
 }
 
 .close-search-btn {
@@ -123,14 +127,15 @@
 }
 
 .kirtan-item:hover {
-  border-color: #667eea;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #1CB5E0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .kirtan-item.selected {
-  background: #f0f8ff;
-  border-color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  background: #f0f9ff;
+  border-color: #1CB5E0;
+  box-shadow: 0 2px 8px rgba(28, 181, 224, 0.2);
 }
 
 .kirtan-title {
@@ -147,7 +152,7 @@
 
 .open-kirtan-btn {
   padding: 5px 12px;
-  background: #667eea;
+  background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
   color: white;
   border: none;
   border-radius: 3px;
@@ -157,7 +162,8 @@
 }
 
 .open-kirtan-btn:hover {
-  background: #5568d3;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transform: translateY(-1px);
 }
 
 /* Right Panel - Matching Lines */
@@ -187,13 +193,15 @@
 }
 
 .matching-line-item:hover {
-  border-color: #667eea;
+  border-color: #1CB5E0;
   background: #f9f9ff;
+  transform: translateX(5px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .matching-line-item.selected {
-  background: #f0f8ff;
-  border-color: #667eea;
+  background: #f0f9ff;
+  border-color: #1CB5E0;
 }
 
 .matching-line-content-wrapper {

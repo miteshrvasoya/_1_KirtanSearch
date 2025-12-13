@@ -578,6 +578,7 @@ function MainApp({ onLogout }) {
       <DatabaseManager
         isOpen={databaseManagerOpen}
         onClose={() => setDatabaseManagerOpen(false)}
+        onEditKirtan={handleEditKirtan}
       />
 
       <PDFImport
