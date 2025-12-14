@@ -10,16 +10,38 @@ const __dirname = path.dirname(__filename);
 
 // 1️⃣ Load JSON
 const jsonPath = "/media/mitesh-vasoya/Spiritual/Seva/_Kirtan_Fetcher/kirtan_output_final.json";
-// Fallback to local file if absolute path doesn't exist
-const finalJsonPath = fs.existsSync(jsonPath) ? jsonPath : path.join(__dirname, "../kirtan_output_final.json");
+
+// Helper to resolve paths
+const possiblePaths = [
+    jsonPath,
+    path.join(__dirname, "../kirtan_output_final.json"), // website/kirtan_output_final.json
+    path.join(__dirname, "../../kirtan_output_final.json"), // root/kirtan_output_final.json
+    path.join(__dirname, "kirtan_output_final.json") // backend/kirtan_output_final.json
+];
+
+let finalJsonPath = null;
+for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+        finalJsonPath = p;
+        break;
+    }
+}
+
+if (!finalJsonPath) {
+    console.error(`\n❌ Error: 'kirtan_output_final.json' not found.`);
+    console.error(`Checked locations:`);
+    possiblePaths.forEach(p => console.error(` - ${p}`));
+    console.error(`\nPlease place the file in the 'website' or project root directory.\n`);
+    process.exit(1);
+}
 
 console.log(`Loading data from: ${finalJsonPath}`);
 const jsonData = JSON.parse(fs.readFileSync(finalJsonPath, "utf8"));
 
 // 2️⃣ Supabase Client
 const supabase = createClient(
-    "https://ijhxupklqiwecembwaqf.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqaHh1cGtscWl3ZWNlbWJ3YXFmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDE4NzY0MSwiZXhwIjoyMDc5NzYzNjQxfQ.d9XTTpi8IKoRuXaktqC7_0_Hg1KjqU_iI7NkuP1SDD4"
+    "http://127.0.0.1:54321",
+    "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
 );
 
 // Map English names from master_data to database columns
