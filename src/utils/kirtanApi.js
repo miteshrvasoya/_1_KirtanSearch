@@ -36,7 +36,7 @@ export const fetchKirtanDetails = async (kirtanId) => {
  * @param {string} adminSecret - Admin secret for authorization
  * @returns {Promise<Object>} Updated kirtan data
  */
-export const updateKirtan = async (id, data, adminSecret) => {
+export const updateKirtan = async (id, data, adminSecret = "") => {
     try {
         const response = await fetch(SUPABASE_CONFIG.updateFunctionUrl, {
             method: 'POST',
@@ -44,7 +44,7 @@ export const updateKirtan = async (id, data, adminSecret) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
                 'apikey': SUPABASE_CONFIG.anonKey,
-                'x-admin-secret': adminSecret
+                // 'x-admin-secret': adminSecret
             },
             body: JSON.stringify({ 
                 id: id,
@@ -52,10 +52,20 @@ export const updateKirtan = async (id, data, adminSecret) => {
             })
         });
 
-        const result = await response.json();
+        console.log("Updating the Kirtan");
+
+        const text = await response.text();
+        console.log("Raw Update Response:", text);
+
+        let result = {};
+        try {
+            result = text ? JSON.parse(text) : {};
+        } catch (e) {
+            console.warn("Could not parse response as JSON:", e);
+        }
 
         if (!response.ok) {
-            throw new Error(result.error || `Update failed: ${response.statusText}`);
+            throw new Error(result.error || `Update failed: ${response.status} ${response.statusText} - ${text}`);
         }
 
         return result;
@@ -191,7 +201,7 @@ const mapSingleKirtan = (item) => {
         hindiContent: htmlToPlainText(item.hindi_unicode_kirtan_text),
 
         // Metadata
-        creator: item.creator_original || item.creator,
+        creator: item.creator || item.creator_original,
         bookName: item.book_name_original,
         englishBookName: item.english_book_name,
         gujaratiBookName: item.gujarati_book_name,

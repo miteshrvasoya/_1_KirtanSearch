@@ -193,16 +193,13 @@
 .kirtan-table {
     width: 100%;
     border-collapse: collapse;
-}
-
-.kirtan-table th, 
-.kirtan-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
+    table-layout: fixed; /* Required for text-overflow: ellipsis */
 }
 
 .kirtan-table th {
+    padding: 8px 10px; /* Reduced padding */
+    text-align: left;
+    border-bottom: 2px solid #ddd;
     background-color: #f8f9fa;
     position: sticky;
     top: 0;
@@ -211,6 +208,24 @@
     color: #444;
     user-select: none;
 }
+
+.kirtan-table td {
+    padding: 8px 10px; /* Reduced padding */
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+/* Define column widths */
+.kirtan-table th:nth-child(1), .kirtan-table td:nth-child(1) { width: 40%; }
+.kirtan-table th:nth-child(2), .kirtan-table td:nth-child(2) { width: 30%; }
+.kirtan-table th:nth-child(3), .kirtan-table td:nth-child(3) { width: 15%; }
+.kirtan-table th:nth-child(4), .kirtan-table td:nth-child(4) { width: 15%; text-align: right; }
+
+
 
 .kirtan-table th.sortable {
     cursor: pointer;

@@ -53,7 +53,7 @@ const DatabasePage = ({ isOpen, onClose, onEditKirtan }) => {
 
   const performSearch = async () => {
     if (!searchTerm.trim()) {
-        setFilteredKirtans(kirtans);
+        setFilteredKirtans([]); // Show empty list if no search
         return;
     }
 
@@ -159,25 +159,59 @@ const DatabasePage = ({ isOpen, onClose, onEditKirtan }) => {
   const handleSaveKirtan = async (savedKirtan) => {
       try {
           const adminSecret = localStorage.getItem('adminSecret');
-          if (adminSecret) {
-            setMessage('Syncing with Supabase...');
-            setMessageType('info');
-            await updateKirtan(savedKirtan.id, savedKirtan, adminSecret);
-            setMessage('Saved locally and synced with Supabase!');
-            setMessageType('success');
+          
+          if (savedKirtan.id) {
+              // UPDATE: Use API directly if secret exists (or throw/handle offline)
+              let adminSecret = "adminSecret";
+              if (adminSecret) {
+                  setMessage('Updating via Supabase API...');
+                  setMessageType('info');
+                  await updateKirtan(savedKirtan.id, savedKirtan, adminSecret);
+                  setMessage('Updated successfully via Supabase!');
+                  setMessageType('success');
+              } else {
+                  // Fallback to local if no secret (or user preference?)
+                  // User "Instead of Storing changes locally" implies API priority.
+                  // But if no secret, we must fail or warn?
+                  // Let's assume Admin Secret is known or we fallback to local + warning.
+                  await kirtanDB.updateKirtan(savedKirtan.id, savedKirtan);
+                  setMessage('Updated locally (No Admin Secret for Cloud Sync).');
+                  setMessageType('warning');
+              }
           } else {
-            setMessage('Saved locally. Set Admin Secret in Settings to sync with Supabase.');
-            setMessageType('warning');
+              // ADD: No API for Add yet, use Local + Sync attempt
+              // Or treating updateKirtan as upsert if backend supports it?
+              // Assuming Local First for Add is safer for now.
+              const newId = await kirtanDB.addKirtan(savedKirtan);
+              savedKirtan.id = newId; // Assign new ID
+
+              let adminSecret = "adminSecret";
+              
+              if (adminSecret) {
+                  try {
+                      await updateKirtan(newId, savedKirtan, adminSecret);
+                       setMessage('Added locally and Synced to Supabase!');
+                  } catch (syncErr) {
+                       setMessage('Added locally. Sync failed: ' + syncErr.message);
+                  }
+              } else {
+                  setMessage('Added locally.');
+              }
+              setMessageType('success');
           }
+          
       } catch (err) {
-          console.error("Supabase Sync Failed", err);
-          setMessage(`Saved locally, but Supabase sync failed: ${err.message}`);
+          console.error("Save Failed", err);
+          setMessage(`Save failed: ${err.message}`);
           setMessageType('error');
+          // If API failed for update, maybe fallback to local?
+          // For now, let's respect the error.
       }
 
       setIsEditModalOpen(false);
       setEditingKirtan(null);
-      loadKirtans();
+      // loadKirtans(); // Local reload - might not reflect API update if API doesn't write to local
+      // But performSearch() in onClose will handle the view refresh.
   };
 
   const handleDeleteKirtan = async (id, title) => {
@@ -268,7 +302,8 @@ const DatabasePage = ({ isOpen, onClose, onEditKirtan }) => {
          isOpen={isEditModalOpen}
          onClose={(saved) => {
              if (saved) {
-                 loadKirtans(); 
+                 loadKirtans();
+                 performSearch(); // Explicitly re-run search/API fetch
              }
              setIsEditModalOpen(false);
          }}

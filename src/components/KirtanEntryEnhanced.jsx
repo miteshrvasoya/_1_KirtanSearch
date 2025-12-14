@@ -256,7 +256,7 @@ const ListManagerModal = ({ isOpen, onClose, lists, onUpdateLists }) => {
   );
 };
 
-const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null }) => {
+const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null, onSave }) => {
   // Initialize dropdown lists from localStorage or defaults
   const getInitialLists = () => {
     const savedLists = localStorage.getItem('kirtanDropdownLists');
@@ -576,14 +576,14 @@ const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null }) => {
     setError('');
 
     try {
-      let result;
+      const result = { ...formData };
       if (editKirtan && editKirtan.id) {
-        result = await kirtanDB.updateKirtan(editKirtan.id, formData);
-        // Result might be just ID or success bool, let's ensure we return the data
-        result = { ...formData, id: editKirtan.id }; 
-      } else {
-        const newId = await kirtanDB.addKirtan(formData);
-        result = { ...formData, id: newId };
+          result.id = editKirtan.id;
+      }
+
+      // Delegate persistence to parent (DatabasePage)
+      if (onSave) {
+          await onSave(result); // This will call updateKirtan API for edits
       }
 
       // Clear any pending conversions
@@ -612,8 +612,7 @@ const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null }) => {
       });
 
       isFirstPaste.current = true;
-      isFirstPaste.current = true;
-      onClose(result); // Pass result object to indicate successful save
+      onClose(result);
     } catch (err) {
       setError('Failed to save kirtan: ' + err.message);
     } finally {
