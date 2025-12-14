@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import kirtanDB from '../utils/database';
 import searchIndex from '../utils/SearchIndex';
+import { searchKirtans } from '../utils/kirtanApi';
 import SUPABASE_CONFIG from '../config/supabase';
 import '../styles/KirtanSearch.css';
 
@@ -58,91 +59,8 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
 
   // Supabase Edge Function integration
   const fetchKirtansFromSupabase = async (query) => {
-    try {
-
-      console.log("Fetching from Supabaseaaa :", query);
-
-      const response = await fetch(SUPABASE_CONFIG.searchFunctionUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000/",
-          "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-          "Access-Control-Allow-Methods": "POST, OPTIONS",
-        },
-        body: JSON.stringify({ english_title: query }),
-      });
-
-      console.log("Response: ", response);
-
-      if (!response.ok) {
-        console.log("Response: ", response);
-        throw new Error(`Supabase API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      // Map Supabase response to component format
-      const mappedKirtans = (Array.isArray(data) ? data : data.kirtans || []).map(item => ({
-        id: item.id || item.pad_id,
-        padId: item.pad_id,
-        pad: item.pad,
-        parentPadId: item.parent_pad_id,
-        totalPad: item.total_pad,
-
-        // Titles
-        englishTitle: item.english_title,
-        unicodeTitle: item.unicode_title || item.gujarati_unicode_title,
-        sulekhTitle: item.sulekh_kirtan_text ? item.sulekh_kirtan_text.split('\n')[0]?.trim() : '',
-        hindiTitle: item.hindi_unicode_title,
-
-        // Content
-        englishContent: item.english_kirtan_text,
-        unicodeContent: item.unicode_kirtan_text || item.gujarati_unicode_kirtan_text,
-        sulekhContent: item.sulekh_kirtan_text,
-        hindiContent: item.hindi_unicode_kirtan_text,
-
-        // Metadata
-        creator: item.creator,
-        book: item.book,
-        bookName: item.book_name_original,
-        englishBookName: item.english_book_name,
-        gujaratiBookName: item.gujarati_book_name,
-        hindiBookName: item.hindi_book_name,
-
-        // Categories and enriched data
-        categoryArray: item.category_array,
-        categoryIds: item.category_ids,
-        event: item.event,
-        place: item.place,
-        kirtanType: item.kirtan_type,
-        adjective: item.adjective,
-        name: item.name,
-        prakashan: item.prakashan,
-        taste: item.taste,
-        origin: item.origin,
-        bhav: item.bhav,
-        singer: item.singer,
-        raag: item.raag,
-        publisher: item.publisher,
-        vocalization: item.vocalization,
-        singerMood: item.singer_mood,
-        singerDetails: item.singer_details,
-        dhal: item.dhal,
-        taalPrakar: item.taal_prakar,
-        taalFromId: item.taal_from_id,
-        recordingQuality: item.recording_quality,
-        album: item.album,
-        vadha: item.vadha,
-
-        createdAt: item.created_at
-      }));
-
-      return mappedKirtans;
-    } catch (error) {
-      console.error('Error fetching from Supabase:', error);
-      throw error;
-    }
+    // Uses the central API utility
+    return await searchKirtans(query);
   };
 
   // Helper to get snippet from text based on a match in that text OR a mapped word index
@@ -356,8 +274,8 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="kirtan-search-modal">
-      <div className="kirtan-search-container">
+    <div className="kirtan-search-modal" onClick={onClose}>
+      <div className="kirtan-search-container" onClick={(e) => e.stopPropagation()}>
         <div className="kirtan-search-header">
           <h2>Kirtan Database</h2>
           <div className="search-controls">

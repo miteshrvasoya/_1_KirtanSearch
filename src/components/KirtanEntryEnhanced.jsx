@@ -308,29 +308,48 @@ const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null }) => {
     localStorage.setItem('kirtanDropdownLists', JSON.stringify(dropdownLists));
   }, [dropdownLists]);
 
+  // Helper to strip HTML if falling back to raw keys
+  const stripHtml = (html) => {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   useEffect(() => {
     if (editKirtan) {
-      // When editing, recalculate first letter from the existing title
-      const sulekhTitle = editKirtan.sulekhTitle || '';
+      // Map potential raw keys (snake_case) if camelCase missing
+      const raw = editKirtan; 
+      
+      const sulekhTitleRaw = raw.sulekhTitle || raw.sulekh_kirtan_text?.split('\n')[0] || '';
+      const sulekhContentRaw = raw.sulekhContent || raw.sulekh_kirtan_text || '';
+      
+      // Clean content if it looks like HTML (starts with <)
+      const sulekhTitle = sulekhTitleRaw.trim().startsWith('<') ? stripHtml(sulekhTitleRaw) : sulekhTitleRaw;
+      const sulekhContent = sulekhContentRaw.trim().startsWith('<') ? stripHtml(sulekhContentRaw) : sulekhContentRaw;
+
+      // Extract first letter
       const firstLetter = sulekhTitle.trim() ? extractFirstLetter(sulekhTitle) : '';
 
       setFormData({
-        pdfPageNo: editKirtan.pdfPageNo || '',
-        pdfIndexNo: editKirtan.pdfIndexNo || '',
-        bookName: editKirtan.bookName || editKirtan.pdfName || '',
-        firstLetterSulekh: firstLetter, // Recalculate instead of using stored value
-        raagName: editKirtan.raagName || '',
-        taalPrakar: editKirtan.taalPrakar || editKirtan.dhaal || '',
-        pad: editKirtan.pad || editKirtan.padNo || '',
-        creator: editKirtan.creator || editKirtan.rachiyata || '',
-        sulekhTitle: sulekhTitle,
-        unicodeTitle: editKirtan.unicodeTitle || '',
-        englishTitle: editKirtan.englishTitle || '',
-        hindiTitle: editKirtan.hindiTitle || '',
-        sulekhContent: editKirtan.sulekhContent || '',
-        unicodeContent: editKirtan.unicodeContent || '',
-        englishContent: editKirtan.englishContent || '',
-        hindiContent: editKirtan.hindiContent || ''
+        pdfPageNo: raw.pdfPageNo || '',
+        pdfIndexNo: raw.pdfIndexNo || '',
+        bookName: raw.bookName || raw.book_name_original || raw.pdfName || '',
+        firstLetterSulekh: firstLetter, 
+        raagName: raw.raagName || raw.raag || '',
+        taalPrakar: raw.taalPrakar || raw.taal_prakar || raw.dhaal || '',
+        pad: raw.pad || raw.padNo || '',
+        creator: raw.creator || raw.creator_original || raw.rachiyata || '',
+        
+        sulekhTitle: stripHtml(sulekhTitle),
+        unicodeTitle: stripHtml(raw.unicodeTitle || raw.unicode_title || raw.gujarati_unicode_title || ''),
+        englishTitle: stripHtml(raw.englishTitle || raw.english_title || ''),
+        hindiTitle: stripHtml(raw.hindiTitle || raw.hindi_unicode_title || ''),
+        
+        sulekhContent: stripHtml(sulekhContent),
+        unicodeContent: stripHtml(raw.unicodeContent || raw.unicode_kirtan_text || raw.gujarati_unicode_kirtan_text || ''),
+        englishContent: stripHtml(raw.englishContent || raw.english_kirtan_text || ''),
+        hindiContent: stripHtml(raw.hindiContent || raw.hindi_unicode_kirtan_text || '')
       });
       isFirstPaste.current = false;
     } else {
@@ -557,10 +576,14 @@ const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null }) => {
     setError('');
 
     try {
+      let result;
       if (editKirtan && editKirtan.id) {
-        await kirtanDB.updateKirtan(editKirtan.id, formData);
+        result = await kirtanDB.updateKirtan(editKirtan.id, formData);
+        // Result might be just ID or success bool, let's ensure we return the data
+        result = { ...formData, id: editKirtan.id }; 
       } else {
-        await kirtanDB.addKirtan(formData);
+        const newId = await kirtanDB.addKirtan(formData);
+        result = { ...formData, id: newId };
       }
 
       // Clear any pending conversions
@@ -589,7 +612,8 @@ const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null }) => {
       });
 
       isFirstPaste.current = true;
-      onClose(true); // Pass true to indicate successful save
+      isFirstPaste.current = true;
+      onClose(result); // Pass result object to indicate successful save
     } catch (err) {
       setError('Failed to save kirtan: ' + err.message);
     } finally {

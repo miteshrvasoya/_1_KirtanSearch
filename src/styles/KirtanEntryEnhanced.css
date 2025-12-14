@@ -9,7 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 100001; /* Must be higher than DatabaseManager (99999) */
   animation: fadeIn 0.3s ease;
 }
 
@@ -168,7 +168,7 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  /* overflow: hidden; Removed to allow page scrolling */
 }
 
 .content-section h3 {
@@ -634,7 +634,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 15px;
   flex: 1;
-  overflow: hidden;
+  /* overflow: hidden; Removed */
 }
 
 .column {
@@ -642,7 +642,7 @@
   flex-direction: column;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  overflow: hidden;
+  /* overflow: hidden; Removed */
   background: #fafafa;
 }
 
@@ -707,13 +707,16 @@
 
 .column .form-group:last-of-type {
   flex: 1;
-  overflow: hidden;
+  /* overflow: hidden; Removed */
 }
 
 .column textarea {
-  resize: none;
+  resize: vertical;
   flex: 1;
   overflow-y: auto;
+  min-height: 60vh; /* Much taller default */
+  font-size: 16px; 
+  line-height: 1.6;
 }
 
 /* Form Actions */

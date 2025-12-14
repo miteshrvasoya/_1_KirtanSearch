@@ -141,6 +141,22 @@ const SettingsModal = ({ isOpen, onClose, editorSettings, onUpdateEditorSettings
             <FaListUl />
           </button>
         </div>
+
+        <div className="editor-group" style={{marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '15px'}}>
+            <label htmlFor="adminSecret" style={{color: '#d32f2f'}}>Admin Secret (Supabase)</label>
+            <input 
+                type="password" 
+                id="adminSecret"
+                value={localStorage.getItem('adminSecret') || ''}
+                onChange={(e) => {
+                    localStorage.setItem('adminSecret', e.target.value);
+                    // Force re-render to show value
+                    setLocalSettings({...localSettings}); 
+                }}
+                placeholder="Enter secret to enable cloud updates..."
+                style={{borderColor: '#d32f2f'}}
+            />
+        </div>
         
         <div className="settings-actions">
           <button className="btn btn-secondary" onClick={onClose}>Close</button>

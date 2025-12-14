@@ -9,7 +9,7 @@ import Login from './components/Login';
 import SettingsModal from './components/SettingModal';
 import VmixModal from './components/VmixModal';
 import KirtanEntryEnhanced from './components/KirtanEntryEnhanced';
-import DatabaseManager from './components/DatabaseManager';
+import DatabasePage from './components/DatabasePage';
 import KirtanSearch from './components/KirtanSearch';
 import PDFImport from './components/PDFImport';
 import PinModal from './components/PinModal';
@@ -575,7 +575,7 @@ function MainApp({ onLogout }) {
         onEditKirtan={handleEditKirtan}
       />
 
-      <DatabaseManager
+      <DatabasePage
         isOpen={databaseManagerOpen}
         onClose={() => setDatabaseManagerOpen(false)}
         onEditKirtan={handleEditKirtan}

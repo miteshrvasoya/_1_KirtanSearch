@@ -8,19 +8,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 99999;
 }
 
 .database-manager-content {
   background: white;
   border-radius: 8px;
   width: 90%;
-  max-width: 1000px; /* Increased width for table */
-  height: 85vh; /* Fixed height */
+  max-width: 1200px; /* Increased max-width for better table view */
+  height: 90vh; /* Increased height */
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  overflow: hidden; /* Manage scroll internally */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  margin-top: 20px; /* Slight offset from top */
 }
 
 .database-manager-header {
@@ -29,7 +30,7 @@
   align-items: center;
   padding: 15px 30px;
   border-bottom: 2px solid #f0f0f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
   color: white;
   flex-shrink: 0;
 }
@@ -72,13 +73,13 @@
 }
 
 .tab-btn:hover {
-    color: #667eea;
+    color: #1CB5E0;
     background-color: #f1f3f5;
 }
 
 .tab-btn.active {
-    color: #667eea;
-    border-bottom-color: #667eea;
+    color: #000851;
+    border-bottom-color: #000851;
     font-weight: 600;
 }
 
@@ -126,6 +127,18 @@
   border: 1px solid #f5c6cb;
 }
 
+.message.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.message.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
 /* List View Controls */
 .list-controls {
     display: flex;
@@ -156,6 +169,12 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 14px;
+}
+
+.search-wrapper input:focus {
+    outline: none;
+    border-color: #1CB5E0;
+    box-shadow: 0 0 0 2px rgba(28, 181, 224, 0.2);
 }
 
 .list-stats {
@@ -226,12 +245,12 @@
 }
 
 .edit-btn {
-    color: #667eea;
+    color: #000851;
     background-color: #eef0ff;
 }
 
 .edit-btn:hover {
-    background-color: #667eea;
+    background-color: #000851;
     color: white;
 }
 
@@ -277,7 +296,7 @@
 }
 
 .action-card:hover {
-  border-color: #667eea;
+  border-color: #1CB5E0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -292,7 +311,7 @@
 
 .action-card i {
   font-size: 40px;
-  color: #667eea;
+  color: #1CB5E0;
   margin-bottom: 15px;
 }
 
@@ -325,13 +344,13 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(28, 181, 224, 0.4);
 }
 
 .btn-danger {
@@ -355,7 +374,7 @@
 
 .database-info {
   background: #f0f8ff;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #1CB5E0;
   padding: 15px;
   border-radius: 5px;
 }
