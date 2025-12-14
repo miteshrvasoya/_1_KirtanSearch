@@ -52,181 +52,199 @@
   padding: 20px;
 }
 
-/* Selected lines container */
-.selected-lines {
-  flex: 1;
-  overflow-y: auto;
+/* Main Container for Split View */
+.selected-lines-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    gap: 10px;
 }
 
-/* Individual selected line items */
-.selected-line {
-  padding: 12px 15px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.2s;
-  cursor: pointer;
-  background-color: #f8f8f8;
-  scroll-margin: 50px;
+.section-title {
+    margin: 0 0 5px 0;
+    font-size: 13px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
 }
 
-.selected-line.selected {
-  background-color: rgba(66, 133, 244, 0.1);
-  border-left: 3px solid var(--primary-color);
+/* --- Top Section: Shortcuts (Grid) --- */
+.shortcuts-section {
+    flex: 1; /* Takes available space, but shares with bottom */
+    display: flex;
+    flex-direction: column;
+    min-height: 150px;
+    max-height: 50%; /* Limit to half height max by default */
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
 }
 
-/*
-.selected-line:hover {
-  background-color: rgba(66, 133, 244, 0.05);
-}
-*/
-
-/* Line number styling */
-.line-number {
-  font-weight: bold;
-  margin-right: 10px;
-  min-width: 25px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--secondary-color);
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 Columns as requested by "3*2" implies 3 rows, 2 cols? User said "3 * 2 (rows * columns)" which usually means 3 rows, 2 columns. */
+    /* If user meant 3 columns 2 rows, I should use repeat(3, 1fr). "3 * 2 (rows * columns)" -> 3 rows, 2 columns. So 2 columns is correct. */
+    gap: 8px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
-/* Line text styling */
-.line-text {
-  flex: 1;
-  font-family: 'Guj_Regular_Bold_Sulekh', sans-serif;
-  word-break: break-word;
+.selected-line-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 60px; /* Fixed height for uniformity */
+    display: flex;
+    align-items: center;
 }
 
-/* Remove button styling */
-.remove-btn {
-  color: var(--accent-color);
-  cursor: pointer;
-  font-size: 18px;
-  width: 25px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
+.selected-line-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.remove-btn:hover {
-  background-color: rgba(234, 67, 53, 0.1);
-  transform: scale(1.1);
+.selected-line-card.selected {
+    background-color: rgba(66, 133, 244, 0.1);
+    border: 1px solid var(--primary-color);
 }
 
-/* Focus styles */
-.lines-panel:focus .selected-line.selected,
-.selected-lines:focus .selected-line.selected {
-  background-color: rgba(66, 133, 244, 0.2);
-  outline: 2px solid rgba(66, 133, 244, 0.3);
+.line-number-badge {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    background: var(--secondary-color);
+    color: white;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
 }
 
-.selected-lines-content {
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 5px;
-  /* Add some space below header */
-  margin-top: 0px;
-  /* Adjust based on your header height */
+.line-text-compact {
+    font-family: 'Guj_Regular_Bold_Sulekh', sans-serif;
+    font-size: 14px;
+    line-height: 1.2;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Show max 2 lines */
+    line-clamp: 2; /* Standard property */
+    -webkit-box-orient: vertical;
+    width: 100%;
+    padding-right: 15px; /* Space for close btn */
 }
 
-/* Related Pads Styles */
-.related-pads-header {
-  padding: 10px;
-  background-color: #f0f7ff;
-  border-radius: 8px;
-  margin-bottom: 10px;
+.remove-btn-compact {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+    line-height: 1;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
-.related-pads-header h4 {
-  margin: 0 0 5px 0;
-  color: #1a73e8;
-  font-size: 14px;
+.remove-btn-compact:hover {
+    background: #ffcccc;
+    color: red;
 }
 
-.current-pad-info {
-  margin: 0;
-  font-size: 12px;
-  color: #5f6368;
+/* --- Bottom Section: Siblings (List) --- */
+.siblings-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 150px;
+    overflow: hidden;
 }
 
-.related-pad-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  margin-bottom: 8px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-left: 3px solid transparent;
+.siblings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
 }
 
-.related-pad-item:hover {
-  background-color: #e8f0fe;
-  border-left-color: #1a73e8;
-  transform: translateX(2px);
+.current-pad-badge {
+    font-size: 11px;
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
-.pad-number {
-  min-width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #1a73e8;
-  color: white;
-  border-radius: 50%;
-  font-weight: bold;
-  margin-right: 12px;
-  font-size: 14px;
+.siblings-list {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 5px;
 }
 
-.pad-info {
-  flex: 1;
-  min-width: 0;
+.related-pad-item-compact {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-.pad-title {
-  font-family: 'Noto Sans Gujarati', 'Shruti', sans-serif;
-  font-size: 14px;
-  color: #202124;
-  margin-bottom: 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.related-pad-item-compact:hover {
+    background: #f0f7ff;
+    border-color: #bbdefb;
 }
 
-.pad-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
+.pad-number-compact {
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    background: #999;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
 }
 
-.pad-badge.parent {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+.related-pad-item-compact:hover .pad-number-compact {
+    background: var(--primary-color);
 }
 
-.pad-badge.child {
-  background-color: #fff3e0;
-  color: #ef6c00;
+.pad-title-compact {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Noto Sans Gujarati', 'Shruti', sans-serif;
+    color: #333;
 }
 
-.pad-badge.sibling {
-  background-color: #e3f2fd;
-  color: #1976d2;
+.empty-siblings {
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
 }
 
-.pad-arrow {
-  color: #5f6368;
-  font-size: 18px;
-  margin-left: 8px;
+/* Clean up old unused styles if any overlap */
+.panel-placeholder {
+    font-size: 13px;
 }

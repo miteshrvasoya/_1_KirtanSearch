@@ -91,7 +91,7 @@ const LinesPanel = ({
                 />
               )}
               <span className="line-index">{index + 1}.</span>
-              <div className="line-text">{line}</div>
+              <div className="line-text">{line.trim()}</div>
               {!isDeleteMode && (
                 <div
                   className="add-btn"

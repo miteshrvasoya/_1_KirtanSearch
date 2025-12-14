@@ -45,63 +45,75 @@ const SelectedLinesPanel = ({
       </div>
 
       {/* Scrollable Content */}
-      <div className="selected-lines-content">
-        {showRelatedPads ? (
-          // Show related pads
-          <>
-            <div className="related-pads-header">
-              <h4>Related Pads</h4>
-              <p className="current-pad-info">
-                Current: Pad {currentKirtan.pad || 'N/A'}
-              </p>
+      {/* Scrollable Content Container */}
+      <div className="selected-lines-container">
+        
+        {/* Top Section: Shortcut Kadis (Grid) */}
+        <div className="shortcuts-section">
+            <h4 className="section-title">Shortcut Kadis</h4>
+            <div className={`shortcuts-grid ${selectedLines.length > 6 ? 'scrollable' : ''}`}>
+                {selectedLines.length === 0 ? (
+                    <p className="panel-placeholder">Select lines to add shortcuts</p>
+                ) : (
+                    selectedLines.map((line, index) => (
+                        <div
+                        key={index}
+                        data-index={index}
+                        className={`selected-line-card ${currentDisplayedText === line ? 'selected' : ''}`}
+                        onClick={() => {
+                            onDisplayLine(line);
+                        }}
+                        >
+                        <div className="line-number-badge">{index + 1}</div>
+                        <div className="line-text-compact" title={line}>{line}</div>
+                        <div
+                            className="remove-btn-compact"
+                            onClick={(e) => {
+                            e.stopPropagation();
+                            onRemoveLine(index);
+                            }}
+                        >
+                            ×
+                        </div>
+                        </div>
+                    ))
+                )}
             </div>
-            {relatedPads.map((pad, index) => (
-              <div
-                key={pad.id}
-                className="related-pad-item"
-                onClick={() => onSelectRelatedPad && onSelectRelatedPad(pad)}
-              >
-                <div className="pad-number">
-                  {pad.pad || index + 1}
-                </div>
-                <div className="pad-info">
-                  <div className="pad-title">
-                    {pad.unicodeTitle || pad.sulekhTitle || 'Untitled'}
-                  </div>
-                </div>
-                <div className="pad-arrow">→</div>
-              </div>
-            ))}
-          </>
-        ) : selectedLines.length === 0 ? (
-          <p className="panel-placeholder">Selected lines will appear here</p>
-        ) : (
-          // Show manually selected lines
-          selectedLines.map((line, index) => (
-            <div
-              key={index}
-              data-index={index}
-              className={`selected-line ${currentDisplayedText === line ? 'selected' : ''}`}
-              onClick={() => {
-                onDisplayLine(line);
-                const element = document.querySelector(`.selected-line[data-index="${index}"]`);
-                element?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-              }}
-            >
-              <div className="line-number">{index < 9 ? index + 1 : ''}</div>
-              <div className="line-text">{line}</div>
-              <div
-                className="remove-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemoveLine(index);
-                }}
-              >
-                ×
-              </div>
+        </div>
+
+        {/* Bottom Section: Related Pads (List) */}
+        <div className="siblings-section">
+            <div className="siblings-header">
+                <h4 className="section-title">Sibling Kirtans / Pads</h4>
+                {currentKirtan && (
+                    <span className="current-pad-badge">Current: Pad {currentKirtan.pad || 'N/A'}</span>
+                )}
             </div>
-          ))
-        )}
+            
+            <div className="siblings-list">
+                {relatedPads.length === 0 ? (
+                    <div className="empty-siblings">No sibling kirtans found</div>
+                ) : (
+                    relatedPads.map((pad, index) => (
+                        <div
+                            key={pad.id}
+                            className="related-pad-item-compact"
+                            onClick={() => onSelectRelatedPad && onSelectRelatedPad(pad)}
+                        >
+                            <div className="pad-number-compact">
+                            {pad.pad || index + 1}
+                            </div>
+                            <div className="pad-info">
+                            <div className="pad-title-compact">
+                                {pad.unicodeTitle || pad.sulekhTitle || 'Untitled'}
+                            </div>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+
       </div>
     </div>
   );
