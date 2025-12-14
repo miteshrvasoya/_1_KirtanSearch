@@ -25,29 +25,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
   border-bottom: 2px solid #f0f0f0;
   background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
   color: white;
 }
 
 .kirtan-search-header h2 {
-  margin: 0;
+  margin: 0 0 0 20px;
   font-size: 24px;
 }
 
 .search-controls {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .kirtan-search-input {
-  padding: 12px 25px;
+  padding: 8px 25px;
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 50px;
   width: 350px;
-  font-size: 16px;
+  font-size: 14px;
   background: white;
   color: #333;
   transition: all 0.3s ease;
@@ -96,14 +96,14 @@
 }
 
 .panel-header {
-  padding: 15px 20px;
+  padding: 10px 20px;
   background: #f9f9f9;
   border-bottom: 1px solid #e0e0e0;
 }
 
 .panel-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   color: #333;
 }
 
@@ -117,8 +117,8 @@
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 5px;
-  padding: 15px;
-  margin-bottom: 10px;
+  padding: 8px;
+  margin-bottom: 2px;
   cursor: pointer;
   transition: all 0.3s;
   display: flex;
@@ -139,7 +139,7 @@
 }
 
 .kirtan-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #333;
   margin-bottom: 0;

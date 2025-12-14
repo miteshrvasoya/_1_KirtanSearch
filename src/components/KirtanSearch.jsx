@@ -311,7 +311,10 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
                     <div
                       key={kirtan.id}
                       className={`kirtan-item ${selectedKirtan?.id === kirtan.id ? 'selected' : ''}`}
-                      onClick={() => handleKirtanClick(kirtan)}
+                      onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenKirtan(kirtan);
+                          }}
                       onDoubleClick={() => handleKirtanDoubleClick(kirtan)}
                     >
                       <div className="kirtan-title" style={{ fontFamily: getFontFamily('unicode') }}>
@@ -321,7 +324,7 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
                           highlightMatch(kirtan.unicodeTitle, searchQuery, isGujarati(searchQuery))
                         }
                       </div>
-                      <div className="kirtan-actions">
+                      {/* <div className="kirtan-actions">
                         <button
                           className="open-kirtan-btn"
                           onClick={(e) => {
@@ -331,7 +334,7 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
                         >
                           Open
                         </button>
-                      </div>
+                      </div> */}
                     </div>
                   ))}
                   {visibleTitleCount < titleMatches.length && (
