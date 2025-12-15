@@ -653,6 +653,100 @@ const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null, onSave }) => 
         {isProcessing && <div className="processing-message">Converting text...</div>}
 
         <div className="kirtan-entry-form">
+
+
+          <div className="metadata-section">
+            <h3>Kirtan Metadata</h3>
+            <div className="metadata-grid">
+              {/* Row 1 - Reordered as requested */}
+              <CustomDropdown
+                label="Book"
+                value={formData.bookName}
+                onChange={(value) => handleDropdownChange('bookName', value)}
+                options={dropdownLists.pdfNames}
+                onAddOption={(option) => handleAddDropdownOption('pdfNames', option)}
+                placeholder="Select Book..."
+                disabled={saving}
+              />
+
+              <div className="form-group">
+                <label>First Letter (Auto)</label>
+                <input
+                  type="text"
+                  value={formData.firstLetterSulekh}
+                  readOnly
+                  placeholder="Auto-filled from title..."
+                  className="readonly-field"
+                  style={{ fontFamily: "'Guj_Regular_Bold_Sulekh', sans-serif" }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Pad No</label>
+                <input
+                  type="text"
+                  value={formData.pad}
+                  onChange={(e) => handleNumericInput('pad', e.target.value)}
+                  placeholder="Enter pad number..."
+                  disabled={saving}
+                />
+              </div>
+
+              <CustomDropdown
+                label="Rachiyata"
+                value={formData.creator}
+                onChange={(value) => handleDropdownChange('creator', value)}
+                options={dropdownLists.rachiyatas}
+                onAddOption={(option) => handleAddDropdownOption('rachiyatas', option)}
+                placeholder="Select Rachiyata..."
+                disabled={saving}
+              />
+
+              {/* Row 2 */}
+              <CustomDropdown
+                label="Raag"
+                value={formData.raagName}
+                onChange={(value) => handleDropdownChange('raagName', value)}
+                options={dropdownLists.raags}
+                onAddOption={(option) => handleAddDropdownOption('raags', option)}
+                placeholder="Select Raag..."
+                disabled={saving}
+              />
+
+              <CustomDropdown
+                label="Dhaal"
+                value={formData.taalPrakar}
+                onChange={(value) => handleDropdownChange('taalPrakar', value)}
+                options={dropdownLists.dhaals}
+                onAddOption={(option) => handleAddDropdownOption('dhaals', option)}
+                placeholder="Select Dhaal..."
+                disabled={saving}
+              />
+
+              <div className="form-group">
+                <label>Book Page No</label>
+                <input
+                  type="text"
+                  value={formData.pdfPageNo}
+                  onChange={(e) => handleNumericInput('pdfPageNo', e.target.value)}
+                  placeholder="Enter page number..."
+                  disabled={saving}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Book Index No</label>
+                <input
+                  type="text"
+                  value={formData.pdfIndexNo}
+                  onChange={(e) => handleNumericInput('pdfIndexNo', e.target.value)}
+                  placeholder="Enter index number..."
+                  disabled={saving}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Content Section - Moved to top */}
           <div className="content-section">
             <h3>Kirtan Content</h3>
@@ -773,97 +867,7 @@ const KirtanEntryEnhanced = ({ isOpen, onClose, editKirtan = null, onSave }) => 
           </div>
 
           {/* Metadata Section - Below content */}
-          <div className="metadata-section">
-            <h3>Kirtan Metadata</h3>
-            <div className="metadata-grid">
-              {/* Row 1 - Reordered as requested */}
-              <CustomDropdown
-                label="Book"
-                value={formData.bookName}
-                onChange={(value) => handleDropdownChange('bookName', value)}
-                options={dropdownLists.pdfNames}
-                onAddOption={(option) => handleAddDropdownOption('pdfNames', option)}
-                placeholder="Select Book..."
-                disabled={saving}
-              />
-
-              <div className="form-group">
-                <label>First Letter (Auto)</label>
-                <input
-                  type="text"
-                  value={formData.firstLetterSulekh}
-                  readOnly
-                  placeholder="Auto-filled from title..."
-                  className="readonly-field"
-                  style={{ fontFamily: "'Guj_Regular_Bold_Sulekh', sans-serif" }}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Pad No</label>
-                <input
-                  type="text"
-                  value={formData.pad}
-                  onChange={(e) => handleNumericInput('pad', e.target.value)}
-                  placeholder="Enter pad number..."
-                  disabled={saving}
-                />
-              </div>
-
-              <CustomDropdown
-                label="Rachiyata"
-                value={formData.creator}
-                onChange={(value) => handleDropdownChange('creator', value)}
-                options={dropdownLists.rachiyatas}
-                onAddOption={(option) => handleAddDropdownOption('rachiyatas', option)}
-                placeholder="Select Rachiyata..."
-                disabled={saving}
-              />
-
-              {/* Row 2 */}
-              <CustomDropdown
-                label="Raag"
-                value={formData.raagName}
-                onChange={(value) => handleDropdownChange('raagName', value)}
-                options={dropdownLists.raags}
-                onAddOption={(option) => handleAddDropdownOption('raags', option)}
-                placeholder="Select Raag..."
-                disabled={saving}
-              />
-
-              <CustomDropdown
-                label="Dhaal"
-                value={formData.taalPrakar}
-                onChange={(value) => handleDropdownChange('taalPrakar', value)}
-                options={dropdownLists.dhaals}
-                onAddOption={(option) => handleAddDropdownOption('dhaals', option)}
-                placeholder="Select Dhaal..."
-                disabled={saving}
-              />
-
-              <div className="form-group">
-                <label>Book Page No</label>
-                <input
-                  type="text"
-                  value={formData.pdfPageNo}
-                  onChange={(e) => handleNumericInput('pdfPageNo', e.target.value)}
-                  placeholder="Enter page number..."
-                  disabled={saving}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Book Index No</label>
-                <input
-                  type="text"
-                  value={formData.pdfIndexNo}
-                  onChange={(e) => handleNumericInput('pdfIndexNo', e.target.value)}
-                  placeholder="Enter index number..."
-                  disabled={saving}
-                />
-              </div>
-            </div>
-          </div>
+          
 
           <div className="form-actions">
             <button
