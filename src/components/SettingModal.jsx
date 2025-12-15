@@ -5,6 +5,23 @@ import '../styles/SettingModal.css';
 const SettingsModal = ({ isOpen, onClose, editorSettings, onUpdateEditorSettings }) => {
   const [localSettings, setLocalSettings] = useState(editorSettings);
 
+  const DEFAULT_SETTINGS = {
+      fontSize: '60px',
+      textColor: '#8B0000',
+      bgColor: '#f2cfa6',
+      fontFamily: "'Guj_Regular_Bold_Sulekh', sans-serif",
+      isBold: false,
+      isItalic: false,
+      isUnderline: false,
+      textAlign: 'center'
+  };
+
+  const handleReset = () => {
+    if (window.confirm('Are you sure you want to reset to default settings?')) {
+        setLocalSettings(DEFAULT_SETTINGS);
+    }
+  };
+
   const handleSave = () => {
     onUpdateEditorSettings(localSettings);
     onClose();
@@ -163,6 +180,7 @@ const SettingsModal = ({ isOpen, onClose, editorSettings, onUpdateEditorSettings
         </div>
         
         <div className="settings-actions">
+          <button className="btn btn-warning" onClick={handleReset} style={{ marginRight: 'auto', backgroundColor: '#9e0707e8', color: 'white' }}>Reset Defaults</button>
           <button className="btn btn-secondary" onClick={onClose}>Close</button>
           <button className="btn btn-primary" onClick={handleSave}>Save Changes</button>
         </div>

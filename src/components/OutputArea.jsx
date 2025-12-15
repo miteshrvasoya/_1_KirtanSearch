@@ -41,7 +41,6 @@ const OutputArea = ({ content, onContentChange, editorSettings, overlayActive })
       <div
         ref={outputRef}
         className="output-content"
-        contentEditable
         style={outputStyle}
         // data-placeholder="ÁÒ Ùä sÕâãÑÌâÓâÒÇ"
         // dangerouslySetInnerHTML={{ __html: content || 'ÁÒ Ùä sÕâãÑÌâÓâÒÇ' }}

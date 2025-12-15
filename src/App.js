@@ -85,8 +85,8 @@ function MainApp({ onLogout }) {
     const savedSettings = localStorage.getItem('editorSettings');
     return savedSettings ? JSON.parse(savedSettings) : {
       fontSize: '60px',
-      textColor: '#000000',
-      bgColor: '#f2cfa6',
+      textColor: '#8B0000', // Deep Red
+      bgColor: '#f2cfa6',   // Beige
       fontFamily: "'Guj_Regular_Bold_Sulekh', sans-serif",
       isBold: false,
       isItalic: false,

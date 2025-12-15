@@ -11,6 +11,7 @@
   border-top: 2px solid #ddd;
   z-index: 100;
   overflow: hidden;
+  cursor: default;
 }
 
 .output-content {
