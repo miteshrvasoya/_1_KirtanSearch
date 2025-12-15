@@ -142,20 +142,24 @@ const SettingsModal = ({ isOpen, onClose, editorSettings, onUpdateEditorSettings
           </button>
         </div>
 
-        <div className="editor-group" style={{marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '15px'}}>
-            <label htmlFor="adminSecret" style={{color: '#d32f2f'}}>Admin Secret (Supabase)</label>
-            <input 
-                type="password" 
-                id="adminSecret"
-                value={localStorage.getItem('adminSecret') || ''}
-                onChange={(e) => {
-                    localStorage.setItem('adminSecret', e.target.value);
-                    // Force re-render to show value
-                    setLocalSettings({...localSettings}); 
+        {/* Live Preview Section */}
+        <div className="preview-section">
+            <label>Live Preview</label>
+            <div 
+                className="preview-box"
+                style={{
+                    fontSize: localSettings.fontSize,
+                    color: localSettings.textColor,
+                    backgroundColor: localSettings.bgColor,
+                    fontFamily: localSettings.fontFamily,
+                    fontWeight: localSettings.isBold ? 'bold' : 'normal',
+                    fontStyle: localSettings.isItalic ? 'italic' : 'normal',
+                    textDecoration: localSettings.isUnderline ? 'underline' : 'none',
+                    textAlign: localSettings.textAlign
                 }}
-                placeholder="Enter secret to enable cloud updates..."
-                style={{borderColor: '#d32f2f'}}
-            />
+            >
+                ÁÒ Ùä sÕâãÑÌâÓâÒÇ (Jay Swaminarayan)
+            </div>
         </div>
         
         <div className="settings-actions">

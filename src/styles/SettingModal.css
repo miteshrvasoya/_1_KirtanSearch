@@ -81,3 +81,30 @@ select, input[type="color"] {
   justify-content: flex-end;
   gap: 10px;
 }
+
+/* Preview Section */
+.preview-section {
+    margin: 20px 0;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.preview-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #666;
+}
+
+.preview-box {
+    width: 100%;
+    min-height: 100px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
