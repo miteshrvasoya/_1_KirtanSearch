@@ -87,6 +87,9 @@ select, input[type="color"] {
     margin: 20px 0;
     border-top: 1px solid #eee;
     padding-top: 15px;
+    width: 100%;
+    /* Ensure it doesn't overflow parent */
+    max-width: 100%; 
 }
 
 .preview-section label {
@@ -99,6 +102,7 @@ select, input[type="color"] {
 .preview-box {
     width: 100%;
     min-height: 100px;
+    max-height: 300px; /* Limit height */
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -106,5 +110,7 @@ select, input[type="color"] {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    overflow: hidden;
+    overflow: hidden; /* Prevent spillover */
+    box-sizing: border-box; /* Include padding in width */
+    word-break: break-word; /* Wrap long words if needed in preview */
 }

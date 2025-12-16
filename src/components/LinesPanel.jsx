@@ -114,7 +114,9 @@ const LinesPanel = ({
               className="btn btn-primary"
               onClick={(e) => {
                 e.stopPropagation();
-                onDeleteSelectedLines();
+                if (window.confirm(`Are you sure you want to delete ${linesToDelete.length} selected line(s)?`)) {
+                    onDeleteSelectedLines();
+                }
               }}
             >
               Delete Selected ({linesToDelete.length})

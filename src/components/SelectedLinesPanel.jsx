@@ -97,7 +97,7 @@ const SelectedLinesPanel = ({
                     relatedPads.map((pad, index) => (
                         <div
                             key={pad.id}
-                            className="related-pad-item-compact"
+                            className={`related-pad-item-compact ${currentKirtan && pad.id === currentKirtan.id ? 'active-sibling' : ''}`}
                             onClick={() => onSelectRelatedPad && onSelectRelatedPad(pad)}
                         >
                             <div className="pad-number-compact">

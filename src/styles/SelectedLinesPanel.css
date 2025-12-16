@@ -205,18 +205,23 @@
 }
 
 .related-pad-item-compact:hover {
-    background: #f0f7ff;
-    border-color: #bbdefb;
+  background-color: #f5f5f5;
+  border-color: #0d47a1;
+}
+
+.related-pad-item-compact.active-sibling {
+    background-color: #e3f2fd; /* Light Blue BG */
+    border: 1px solid #0d47a1;
+    box-shadow: 0 0 5px rgba(13, 71, 161, 0.2);
 }
 
 .pad-number-compact {
-    font-size: 11px;
     font-weight: bold;
-    color: white;
-    background: #999;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    color: #0d47a1;
+    font-size: 14px;
+    background: rgba(13, 71, 161, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;

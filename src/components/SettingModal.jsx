@@ -101,7 +101,11 @@ const SettingsModal = ({ isOpen, onClose, editorSettings, onUpdateEditorSettings
               onChange={(e) => setLocalSettings({...localSettings, fontFamily: e.target.value})}
             >
               <option value="'Guj_Regular_Bold_Sulekh', sans-serif">Gujarati Sulekh</option>
-              <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Default</option>
+              <option value="'Noto Sans Gujarati', sans-serif">Noto Sans Gujarati</option>
+              <option value="'Noto Sans Devanagari', sans-serif">Noto Sans Devanagari (Hindi/Sanskrit)</option>
+              <option value="'Martel', serif">Martel (Hindi/Sanskrit)</option>
+              <option value="'Poppins', sans-serif">Poppins</option>
+              <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Default (Segoe UI)</option>
               <option value="Arial, sans-serif">Arial</option>
               <option value="'Times New Roman', serif">Times New Roman</option>
             </select>
