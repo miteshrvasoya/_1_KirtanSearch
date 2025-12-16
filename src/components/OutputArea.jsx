@@ -32,29 +32,39 @@ const OutputArea = ({ content, onContentChange, editorSettings, overlayActive })
     return () => window.removeEventListener('resize', resizeText);
   }, [content, editorSettings.fontSize, editorSettings.fontFamily, editorSettings.isBold]);
 
-  const outputStyle = {
-    color: editorSettings.textColor || '#000000',
+  // Split styles: Background on container, Text styles on inner content
+  const containerStyle = {
     backgroundColor: editorSettings.bgColor || '#f2cfa6',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  };
+
+  const textStyle = {
+    color: editorSettings.textColor || '#000000',
     fontFamily: editorSettings.fontFamily,
     fontWeight: editorSettings.isBold ? 'bold' : 'normal',
     fontStyle: editorSettings.isItalic ? 'italic' : 'normal',
     textDecoration: editorSettings.isUnderline ? 'underline' : 'none',
-    textAlign: editorSettings.textAlign,
-    lineHeight: '1.2'
+    textAlign: 'center', // Always center inside the lines
+    lineHeight: '1.2',
+    whiteSpace: 'nowrap',
   };
 
   return (
     <div className={`output-container ${overlayActive ? 'overlay-active' : ''}`}>
       <div
-        ref={outputRef}
         className="output-content"
-        style={outputStyle}
-        // data-placeholder="ÁÒ Ùä sÕâãÑÌâÓâÒÇ"
-        // dangerouslySetInnerHTML={{ __html: content || 'ÁÒ Ùä sÕâãÑÌâÓâÒÇ' }}
-        onInput={(e) => onContentChange(e.target.innerHTML)}
+        style={containerStyle}
       >
-        <div className="output-content-div">
-          {content || 'ÁÒ Ùä sÕâãÑÌâÓâÒÇ'}
+        <div 
+          ref={outputRef}
+          className="output-content-div"
+          style={textStyle}
+        >
+          <div>
+            {content.trim() || 'ÁÒ Ùä sÕâãÑÌâÓâÒÇ'}
+          </div>
         </div>
       </div>
     </div>

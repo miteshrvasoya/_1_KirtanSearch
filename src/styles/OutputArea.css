@@ -5,8 +5,6 @@
   right: 0;
   height: 150px;
   display: flex;
-  justify-content: center;
-  align-items: center;
   /* background-color: #f2cfa6; */
   border-top: 2px solid #ddd;
   z-index: 100;
@@ -18,21 +16,16 @@
   width: 100%;
   max-width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  word-break: break-word;
-  overflow: hidden;
 }
 
 .output-content-div {
-  margin: 0 10%;
-  width: 100%;
+  width: 80%;
+  margin: 0 auto; /* Center the div itself */
   height: 100%;
-  border-left: 3px solid #ddd;
-  border-right: 3px solid #ddd;
-  text-align: center;
+  box-sizing: border-box;
+  border-left: 3px solid #810606;
+  border-right: 3px solid #810606;
+  text-align: center !important;
   justify-content: center;
   align-items: center;
   display: flex;
