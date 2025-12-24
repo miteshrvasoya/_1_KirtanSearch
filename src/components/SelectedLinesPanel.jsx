@@ -41,7 +41,7 @@ const SelectedLinesPanel = ({
     <div className="display-panel">
       {/* Fixed Header */}
       <div className="panel-header">
-        Shortcut Kadi
+        Selection & Related
       </div>
 
       {/* Scrollable Content */}

@@ -362,19 +362,17 @@ function MainApp({ onLogout }) {
       // Fetch full kirtan details from API
       const { kirtan: fullKirtan, siblingKirtans } = await fetchKirtanDetails(kirtan.id);
 
-      // Create a new tab with the kirtan content
-      const newTab = {
-        id: nextTabId,
+      // Create new tab data
+      const contentLines = fullKirtan.sulekhContent
+        ? fullKirtan.sulekhContent.split('\n').filter(line => line.trim() !== '')
+        : [];
+
+      const newTabData = {
         name: fullKirtan.sulekhTitle || fullKirtan.unicodeTitle || fullKirtan.englishTitle || `Kirtan ${nextTabId}`,
-        active: false,
         data: {
-          allLines: fullKirtan.sulekhContent
-            ? fullKirtan.sulekhContent.split('\n').filter(line => line.trim() !== '')
-            : [],
-          selectedLines: [],
-          currentDisplayedText: fullKirtan.sulekhContent
-            ? fullKirtan.sulekhContent.split('\n')[0] || ''
-            : '',
+          allLines: contentLines,
+          selectedLines: contentLines.slice(0, 2), // Auto-add first 2 lines
+          currentDisplayedText: contentLines[0] || '',
           selectedLineIndex: 0,
           originalInputText: fullKirtan.sulekhContent || '',
           currentKirtan: fullKirtan,
@@ -382,32 +380,68 @@ function MainApp({ onLogout }) {
         }
       };
 
-      setTabs([...tabs, newTab]);
-      setActiveTabId(nextTabId);
-      setNextTabId(nextTabId + 1);
+      // Reuse initial empty tab if applicable
+      if (tabs.length === 1 && tabs[0].data.allLines.length === 0 && !tabs[0].data.currentKirtan) {
+        const updatedTab = {
+            ...tabs[0],
+            ...newTabData,
+            active: true
+        };
+        setTabs([updatedTab]);
+        setActiveTabId(tabs[0].id);
+        // Do not increment nextTabId as we reused the existing one
+      } else {
+        const newTab = {
+            id: nextTabId,
+            active: false,
+            ...newTabData
+        };
+        setTabs([...tabs, newTab]);
+        setActiveTabId(nextTabId);
+        setNextTabId(nextTabId + 1);
+      }
+      
       setKirtanSearchOpen(false);
     } catch (error) {
       console.error('Error loading kirtan from API:', error);
       // Fallback to local database if API fails
       try {
         const relatedPads = await kirtanDB.getRelatedPads(kirtan.id);
-        const newTab = {
-          id: nextTabId,
-          name: kirtan.sulekhTitle || kirtan.unicodeTitle || kirtan.englishTitle || `Kirtan ${nextTabId}`,
-          active: false,
-          data: {
-            allLines: kirtan.sulekhContent ? kirtan.sulekhContent.split('\n').filter(line => line.trim() !== '') : [],
-            selectedLines: [],
-            currentDisplayedText: kirtan.sulekhContent ? kirtan.sulekhContent.split('\n')[0] || '' : '',
-            selectedLineIndex: 0,
-            originalInputText: kirtan.sulekhContent || '',
-            currentKirtan: kirtan,
-            relatedPads: relatedPads
-          }
+        
+        const contentLines = kirtan.sulekhContent ? kirtan.sulekhContent.split('\n').filter(line => line.trim() !== '') : [];
+
+        const newTabData = {
+            name: kirtan.sulekhTitle || kirtan.unicodeTitle || kirtan.englishTitle || `Kirtan ${nextTabId}`,
+            data: {
+              allLines: contentLines,
+              selectedLines: contentLines.slice(0, 2), // Auto-add first 2 lines
+              currentDisplayedText: contentLines[0] || '',
+              selectedLineIndex: 0,
+              originalInputText: kirtan.sulekhContent || '',
+              currentKirtan: kirtan,
+              relatedPads: relatedPads
+            }
         };
-        setTabs([...tabs, newTab]);
-        setActiveTabId(nextTabId);
-        setNextTabId(nextTabId + 1);
+
+        if (tabs.length === 1 && tabs[0].data.allLines.length === 0 && !tabs[0].data.currentKirtan) {
+             const updatedTab = {
+                ...tabs[0],
+                ...newTabData,
+                active: true
+            };
+            setTabs([updatedTab]);
+            setActiveTabId(tabs[0].id);
+        } else {
+            const newTab = {
+                id: nextTabId,
+                active: false,
+                ...newTabData
+            };
+            setTabs([...tabs, newTab]);
+            setActiveTabId(nextTabId);
+            setNextTabId(nextTabId + 1);
+        }
+
         setKirtanSearchOpen(false);
       } catch (fallbackError) {
         console.error('Fallback also failed:', fallbackError);

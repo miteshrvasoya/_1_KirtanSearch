@@ -166,6 +166,30 @@ const HeaderClean = ({
       <div style={rightStyle}>
         <button 
           style={buttonStyle} 
+          onClick={onOpenInputModal}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+        >
+          <i className="fas fa-edit"></i> Input
+        </button>
+        <button 
+          style={buttonStyle} 
+          onClick={onAddNewKirtan}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+        >
+          <i className="fas fa-plus"></i> Add Kirtan
+        </button>
+        <button 
+          style={buttonStyle} 
+          onClick={onOpenPDFImport}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+        >
+          <i className="fas fa-file-import"></i> Import
+        </button>
+        <button 
+          style={buttonStyle} 
           onClick={onOpenSettingsModal}
           onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
           onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}

@@ -22,17 +22,17 @@
     width: calc(50% - 20px);
     height: calc(100vh - 280px);
     margin: 10px 10px 10px 10px;
-    border: 2px solid #1f1f1f;
+    border: 2px solid #000000;
   }
 }
 
 /* Panel header */
 .panel-header {
   font-weight: bold;
-  margin-bottom: 5px;
-  padding-bottom: 5px;
-  border-bottom: 2px solid var(--light-gray);
-  color: var(--primary-color);
+  margin-bottom: 10px;
+  padding: 10px;
+  border-bottom: 2px solid #eee; /* Unified border color */
+  color: #333; /* Darker text for headers */
   text-align: center;
   display: flex;
   justify-content: space-between;
@@ -41,8 +41,7 @@
   top: 0;
   background-color: white;
   z-index: 10;
-  position: sticky;
-  top: 0;
+  font-size: 16px; /* Consistent font size */
 }
 
 .panel-placeholder {
@@ -54,21 +53,29 @@
 
 /* Individual line items */
 .line-item {
-  padding: 4px 8px; /* Compact padding */
-  margin-bottom: 2px; /* Reduced margin */
+  padding: 6px 8px; /* Match other panels */
+  margin-bottom: 4px; /* Consistent margin */
   border-radius: 4px;
+  background-color: white; /* Card bg */
+  border: 1px solid #eee; /* Card border */
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: all 0.2s;
   cursor: pointer;
   scroll-margin: 50px;
-  font-size: 14px; /* Slightly smaller base font */
+  font-size: 14px;
 }
 
 .line-item.selected {
-  background-color: rgba(66, 133, 244, 0.1);
-  border-left: 3px solid var(--primary-color);
+  background-color: #e3f2fd; /* Light Blue BG */
+  border: 1px solid #0d47a1;
+  box-shadow: 0 0 5px rgba(13, 71, 161, 0.2);
+}
+
+.line-item:hover {
+  background-color: #f5f5f5;
+  border-color: #0d47a1;
 }
 
 /*
@@ -90,6 +97,14 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-weight: bold;
   min-width: 25px;
+  background: rgba(13, 71, 161, 0.1);
+  color: #0d47a1;
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Action buttons */
