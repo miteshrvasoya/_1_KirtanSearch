@@ -98,9 +98,23 @@ export const searchKirtans = async (query) => {
         }
 
         const data = await response.json();
-        const results = Array.isArray(data) ? data : data.kirtans || [];
         
-        return results.map(mapSingleKirtan);
+        // New API response structure: { title_matches: [], content_matches: [], meta: {} }
+        if (data.title_matches && data.content_matches) {
+            return {
+                titleMatches: data.title_matches.map(mapSingleKirtan),
+                contentMatches: data.content_matches.map(mapSingleKirtan),
+                meta: data.meta
+            };
+        }
+        
+        // Fallback for old response format
+        const results = Array.isArray(data) ? data : data.kirtans || [];
+        return {
+            titleMatches: results.map(mapSingleKirtan),
+            contentMatches: [],
+            meta: { query: query, title_count: results.length, content_count: 0 }
+        };
     } catch (error) {
         console.error('Error searching kirtans:', error);
         throw error;

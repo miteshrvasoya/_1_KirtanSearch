@@ -129,91 +129,22 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
 
       setLoading(true);
       try {
-        // Use the existing Supabase fetch function to get relevant kirtans
-        const fetchedKirtans = await fetchKirtansFromSupabase(searchQuery);
+        // Use the Supabase fetch function to get title and content matches
+        const searchResult = await fetchKirtansFromSupabase(searchQuery);
 
-        // Re-initialize search index with the fetched (potentially pre-filtered) data
-        searchIndex.init(fetchedKirtans);
-
-        const query = searchQuery.toLowerCase();
-        const isGuj = isGujarati(query);
-        const isHin = isHindi(query);
-
-        // Define fields based on language for client-side search refinement
-        let titleFields = ['sulekhTitle', 'englishTitle'];
-        let contentFields = ['sulekhContent', 'englishContent'];
-
-        if (isGuj) {
-          titleFields = ['unicodeTitle'];
-          contentFields = ['unicodeContent'];
-        } else if (isHin) {
-          titleFields = ['hindiTitle'];
-          contentFields = ['hindiContent'];
-        }
-
-        // 1. Title Matches (Left Panel) - Refine using client-side search index
-        const tMatches = searchIndex.search(query, { fields: titleFields });
-        setTitleMatches(tMatches);
-
-        // 2. Content Matches (Right Panel) - Refine using client-side search index
-        const cResults = searchIndex.search(query, { fields: contentFields });
-
-        const cMatches = [];
-        cResults.forEach(kirtan => {
-          const displayContent = isHin ? kirtan.hindiContent : kirtan.unicodeContent;
-          const displayTitle = isHin ? kirtan.hindiTitle : (kirtan.unicodeTitle || kirtan.sulekhTitle);
-
-          const displayLines = displayContent ? displayContent.split('\n') : [];
-
-          const processContent = (content, type) => {
-            if (!content) return;
-            const contentLines = content.split('\n');
-            contentLines.forEach((line, index) => {
-              if (line.toLowerCase().includes(query)) {
-                const displayLine = displayLines[index] || line;
-
-                const words = line.split(/\s+/);
-                const queryWords = query.split(/\s+/);
-                let matchWordIndex = -1;
-                for (let i = 0; i < words.length; i++) {
-                  const slice = words.slice(i, i + queryWords.length).join(' ');
-                  if (slice.toLowerCase().includes(query)) {
-                    matchWordIndex = i;
-                    break;
-                  }
-                }
-
-                const snippet = getSnippet(displayLine, null, matchWordIndex);
-
-                cMatches.push({
-                  kirtanId: kirtan.id,
-                  kirtanTitle: displayTitle,
-                  snippet: snippet,
-                  fullLine: displayLine,
-                  lineNumber: index + 1,
-                  type: isHin ? 'hindi' : 'unicode',
-                  originalKirtan: kirtan,
-                  isDirectMatch: (isHin && type === 'hindi') || (isGuj && type === 'unicode')
-                });
-              }
-            });
-          };
-
-          if (isGuj) {
-            processContent(kirtan.unicodeContent, 'unicode');
-          } else if (isHin) {
-            processContent(kirtan.hindiContent, 'hindi');
-          } else {
-            processContent(kirtan.sulekhContent, 'sulekh');
-            processContent(kirtan.englishContent, 'english');
-          }
+        // API now returns { titleMatches, contentMatches, meta }
+        setTitleMatches(searchResult.titleMatches || []);
+        setContentMatches(searchResult.contentMatches || []);
+        
+        console.log('Search results:', {
+          titleCount: searchResult.titleMatches?.length || 0,
+          contentCount: searchResult.contentMatches?.length || 0,
+          meta: searchResult.meta
         });
-
-        setContentMatches(cMatches);
       } catch (error) {
         console.error('Error during search:', error);
-        // Fallback to client-side search on previously loaded allKirtans if Supabase fails
-        // Or handle error appropriately
+        setTitleMatches([]);
+        setContentMatches([]);
       } finally {
         setLoading(false);
       }
@@ -360,25 +291,27 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
                 </div>
               ) : (
                 <>
-                  {contentMatches.slice(0, visibleContentCount).map((match, index) => (
+                  {contentMatches.slice(0, visibleContentCount).map((kirtan, index) => (
                     <div
-                      key={`${match.kirtanId}-${index}`}
-                      className={`matching-line-item ${selectedKirtan?.id === match.kirtanId ? 'selected' : ''}`}
+                      key={`${kirtan.id}-${index}`}
+                      className={`matching-line-item ${selectedKirtan?.id === kirtan.id ? 'selected' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleOpenKirtan(match.originalKirtan);
+                        handleOpenKirtan(kirtan);
                       }}
-                      onDoubleClick={() => handleKirtanDoubleClick(match.originalKirtan)}
+                      onDoubleClick={() => handleKirtanDoubleClick(kirtan)}
                     >
                       <div className="matching-line-content-wrapper">
                         <div className="line-kirtan-title" style={{ fontFamily: getFontFamily('unicode') }}>
-                          {match.kirtanTitle}
+                          {isHindi(searchQuery) ?
+                            highlightMatch(kirtan.hindiTitle, searchQuery, true) :
+                            highlightMatch(kirtan.unicodeTitle, searchQuery, isGujarati(searchQuery))
+                          }
                         </div>
-                        <div
-                          className="line-content"
-                          style={{ fontFamily: getFontFamily('unicode') }}
-                        >
-                          {highlightMatch(match.snippet, searchQuery, match.isDirectMatch)}
+                        <div className="line-content" style={{ fontFamily: getFontFamily('unicode') }}>
+                          {kirtan.creator && <span>{kirtan.creator}</span>}
+                          {kirtan.creator && kirtan.bookName && <span> • </span>}
+                          {kirtan.bookName && <span>{kirtan.bookName}</span>}
                         </div>
                       </div>
                     </div>
