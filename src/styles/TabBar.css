@@ -32,6 +32,7 @@
 
 .tab {
   display: flex;
+  font-size: 14px;
   align-items: center;
   padding: 8px 12px;
   background: #fff;
@@ -72,6 +73,7 @@
 .tab.active .tab-name {
   font-weight: 500;
   /* color: #000; */
+  font-size: 14px;
 }
 
 .tab-close {
