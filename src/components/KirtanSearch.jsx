@@ -364,27 +364,22 @@ const KirtanSearch = ({ isOpen, onClose, onSelectKirtan, onEditKirtan }) => {
                     <div
                       key={`${match.kirtanId}-${index}`}
                       className={`matching-line-item ${selectedKirtan?.id === match.kirtanId ? 'selected' : ''}`}
-                      onClick={() => handleMatchClick(match)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenKirtan(match.originalKirtan);
+                      }}
+                      onDoubleClick={() => handleKirtanDoubleClick(match.originalKirtan)}
                     >
-                      <div className="line-kirtan-title" style={{ fontFamily: getFontFamily('unicode') }}>
-                        {match.kirtanTitle}
-                      </div>
-                      <div
-                        className="line-content"
-                        style={{ fontFamily: getFontFamily('unicode') }}
-                      >
-                        {highlightMatch(match.snippet, searchQuery, match.isDirectMatch)}
-                      </div>
-                      <div className="kirtan-actions">
-                        <button
-                          className="open-kirtan-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenKirtan(match.originalKirtan);
-                          }}
+                      <div className="matching-line-content-wrapper">
+                        <div className="line-kirtan-title" style={{ fontFamily: getFontFamily('unicode') }}>
+                          {match.kirtanTitle}
+                        </div>
+                        <div
+                          className="line-content"
+                          style={{ fontFamily: getFontFamily('unicode') }}
                         >
-                          Open
-                        </button>
+                          {highlightMatch(match.snippet, searchQuery, match.isDirectMatch)}
+                        </div>
                       </div>
                     </div>
                   ))}
