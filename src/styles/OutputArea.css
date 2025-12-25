@@ -29,6 +29,15 @@
   justify-content: center;
   align-items: center;
   display: flex;
+  padding: 30px; /* Padding to keep text away from borders */
+}
+
+.output-content-div div {
+  border: 1px solid red;
+  max-width: 100%;
+  max-height: 100%;
+  /* Prevent flex child from expanding beyond available space */
+  flex-shrink: 0;
 }
 
 .output-content[data-placeholder]:empty:before {

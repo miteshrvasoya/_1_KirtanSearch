@@ -20,7 +20,7 @@ const OutputArea = ({ content, onContentChange, editorSettings, overlayActive })
       // We check scrollHeight > clientHeight for vertical overflow (though less likely with single line)
       while (
         (element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight) && 
-        fontSize > 10 // Minimum legible font size
+        fontSize > 24 // Minimum font size to keep text readable
       ) {
         fontSize -= 1;
         element.style.fontSize = `${fontSize}px`;
@@ -58,11 +58,12 @@ const OutputArea = ({ content, onContentChange, editorSettings, overlayActive })
         style={containerStyle}
       >
         <div 
-          ref={outputRef}
           className="output-content-div"
-          style={textStyle}
         >
-          <div>
+          <div
+            ref={outputRef}
+            style={textStyle}
+          >
             {content.trim() || 'ÁÒ Ùä sÕâãÑÌâÓâÒÇ'}
           </div>
         </div>
