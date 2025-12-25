@@ -31,12 +31,13 @@ function MainApp({ onLogout }) {
     {
       id: 1, name: 'Tab 1', active: true, data: {
         allLines: [],
+        sulekhLines: [], // Sulekh version for output
         selectedLines: [],
         currentDisplayedText: 'ÁÒ Ùä sÕâãÑÌâÓâÒÇ',
         selectedLineIndex: -1,
-        originalInputText: '', // Store the original input text
-        currentKirtan: null, // Store the current kirtan object
-        relatedPads: [] // Store related pads
+        originalInputText: '',
+        currentKirtan: null,
+        relatedPads: []
       }
     }
   ]);
@@ -128,12 +129,14 @@ function MainApp({ onLogout }) {
   }, [vmixSettings, overlayActive]);
 
   const selectLine = useCallback((index) => {
+    // Use sulekh for output if available, otherwise fallback to unicode
+    const sulekhLines = currentTab.data.sulekhLines || allLines;
     updateCurrentTab({
       selectedLineIndex: index,
-      currentDisplayedText: allLines[index]
+      currentDisplayedText: sulekhLines[index] || allLines[index]
     });
     scrollToLine(index);
-  }, [allLines, updateCurrentTab]);
+  }, [allLines, currentTab.data.sulekhLines, updateCurrentTab]);
 
   // Keyboard handler
   useEffect(() => {
@@ -186,6 +189,7 @@ function MainApp({ onLogout }) {
       active: false,
       data: {
         allLines: [],
+        sulekhLines: [],
         selectedLines: [],
         currentDisplayedText: 'ÁÒ Ùä sÕâãÑÌâÓâÒÇ',
         selectedLineIndex: -1,
@@ -362,21 +366,26 @@ function MainApp({ onLogout }) {
       // Fetch full kirtan details from API
       const { kirtan: fullKirtan, siblingKirtans } = await fetchKirtanDetails(kirtan.id);
 
-      // Create new tab data
-      const contentLines = fullKirtan.sulekhContent
+      // Create new tab data - use unicode for panel display
+      const unicodeLines = fullKirtan.unicodeContent
+        ? fullKirtan.unicodeContent.split('\n').filter(line => line.trim() !== '')
+        : [];
+      
+      const sulekhLines = fullKirtan.sulekhContent
         ? fullKirtan.sulekhContent.split('\n').filter(line => line.trim() !== '')
         : [];
 
       const newTabData = {
-        name: fullKirtan.sulekhTitle || fullKirtan.unicodeTitle || fullKirtan.englishTitle || `Kirtan ${nextTabId}`,
+        name: fullKirtan.unicodeTitle || fullKirtan.sulekhTitle || fullKirtan.englishTitle || `Kirtan ${nextTabId}`,
         data: {
-          allLines: contentLines,
-          selectedLines: contentLines.slice(0, 2), // Auto-add first 2 lines
-          currentDisplayedText: contentLines[0] || '',
+          allLines: unicodeLines, // Unicode for panel display
+          sulekhLines: sulekhLines, // Sulekh for output
+          selectedLines: unicodeLines.slice(0, 2), // Auto-add first 2 unicode lines
+          currentDisplayedText: sulekhLines[0] || '', // Display sulekh in output
           selectedLineIndex: 0,
-          originalInputText: fullKirtan.sulekhContent || '',
+          originalInputText: fullKirtan.unicodeContent || '',
           currentKirtan: fullKirtan,
-          relatedPads: siblingKirtans // Map sibling_kirtans to relatedPads
+          relatedPads: siblingKirtans
         }
       };
 
@@ -408,16 +417,18 @@ function MainApp({ onLogout }) {
       try {
         const relatedPads = await kirtanDB.getRelatedPads(kirtan.id);
         
-        const contentLines = kirtan.sulekhContent ? kirtan.sulekhContent.split('\n').filter(line => line.trim() !== '') : [];
+        const unicodeLines = kirtan.unicodeContent ? kirtan.unicodeContent.split('\n').filter(line => line.trim() !== '') : [];
+        const sulekhLines = kirtan.sulekhContent ? kirtan.sulekhContent.split('\n').filter(line => line.trim() !== '') : [];
 
         const newTabData = {
-            name: kirtan.sulekhTitle || kirtan.unicodeTitle || kirtan.englishTitle || `Kirtan ${nextTabId}`,
+            name: kirtan.unicodeTitle || kirtan.sulekhTitle || kirtan.englishTitle || `Kirtan ${nextTabId}`,
             data: {
-              allLines: contentLines,
-              selectedLines: contentLines.slice(0, 2), // Auto-add first 2 lines
-              currentDisplayedText: contentLines[0] || '',
+              allLines: unicodeLines,
+              sulekhLines: sulekhLines,
+              selectedLines: unicodeLines.slice(0, 2),
+              currentDisplayedText: sulekhLines[0] || '',
               selectedLineIndex: 0,
-              originalInputText: kirtan.sulekhContent || '',
+              originalInputText: kirtan.unicodeContent || '',
               currentKirtan: kirtan,
               relatedPads: relatedPads
             }

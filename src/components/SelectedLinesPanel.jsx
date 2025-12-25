@@ -65,7 +65,7 @@ const SelectedLinesPanel = ({
                         }}
                         >
                         <div className="line-number-badge">{index + 1}</div>
-                        <div className="line-text-compact" title={line}>{line}</div>
+                        <div className="line-text-compact" title={line.trim()}>{line.trim()}</div>
                         <div
                             className="remove-btn-compact"
                             onClick={(e) => {

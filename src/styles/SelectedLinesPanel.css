@@ -134,8 +134,8 @@
 
 .line-text-compact {
     font-family: 'Guj_Regular_Bold_Sulekh', sans-serif;
-    font-size: 14px;
-    line-height: 1.2;
+    font-size: 13px;
+    /* line-height: 1.2; */
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2; /* Show max 2 lines */
@@ -205,6 +205,7 @@
     border: 1px solid #eee;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 13px;
 }
 
 .related-pad-item-compact:hover {
@@ -245,7 +246,7 @@
 }
 
 .empty-siblings {
-    font-size: 12px;
+    font-size: 13px;
     color: #999;
     font-style: italic;
     text-align: center;
