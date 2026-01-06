@@ -24,6 +24,7 @@
 
 .vmix-controls {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 20px;

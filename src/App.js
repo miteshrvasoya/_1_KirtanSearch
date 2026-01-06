@@ -150,6 +150,15 @@ function MainApp({ onLogout }) {
         return;
       }
 
+      // Open Kirtan Search on Tilde (~) or Backtick (`)
+      if (e.key === '~' || e.key === '`') {
+          if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName) && !e.target.isContentEditable) {
+              e.preventDefault();
+              setKirtanSearchOpen(true);
+          }
+          return;
+      }
+
       if (allLines.length > 0 && isInputPanelFocused) {
         if (e.key === 'ArrowUp') {
           e.preventDefault();
@@ -170,7 +179,10 @@ function MainApp({ onLogout }) {
           e.preventDefault();
           const num = parseInt(e.key);
           if (num <= selectedLines.length) {
-            updateCurrentTab({ currentDisplayedText: selectedLines[num - 1] });
+            const line = selectedLines[num - 1];
+            // Handle both object (new) and string (legacy) formats
+            const textToDisplay = typeof line === 'string' ? line : (line.sulekh || line.unicode);
+            updateCurrentTab({ currentDisplayedText: textToDisplay });
             scrollToLine(num - 1, true);
           }
         }
@@ -246,7 +258,9 @@ function MainApp({ onLogout }) {
           name: tabName,
           data: {
             ...tab.data,
+            ...tab.data,
             allLines: lines,
+            sulekhLines: lines, // For manual input without conversion, assume same
             selectedLines: [],
             selectedLineIndex: lines.length > 0 ? 0 : -1,
             currentDisplayedText: lines.length > 0 ? lines[0] : '',
@@ -284,9 +298,21 @@ function MainApp({ onLogout }) {
     updateCurrentTab({ selectedLineIndex: index });
   };
 
-  const addToSelectedLines = (line) => {
-    if (!selectedLines.includes(line)) {
-      const newSelectedLines = [...selectedLines, line];
+  const addToSelectedLines = (index) => {
+    // Determine unicode and sulekh versions
+    const unicodeLine = allLines[index];
+    const sulekhLines = currentTab.data.sulekhLines || [];
+    const sulekhLine = sulekhLines[index] || unicodeLine;
+    
+    // Check if line (unicode) already exists in selectedLines
+    // selectedLines now stores objects: { unicode: '...', sulekh: '...' }
+    const exists = selectedLines.some(line => 
+      (typeof line === 'string' ? line : line.unicode) === unicodeLine
+    );
+
+    if (!exists) {
+      const lineObj = { unicode: unicodeLine, sulekh: sulekhLine };
+      const newSelectedLines = [...selectedLines, lineObj];
       updateCurrentTab({ selectedLines: newSelectedLines });
     }
     setIsInputPanelFocused(false);
@@ -380,7 +406,11 @@ function MainApp({ onLogout }) {
         data: {
           allLines: unicodeLines, // Unicode for panel display
           sulekhLines: sulekhLines, // Sulekh for output
-          selectedLines: unicodeLines.slice(0, 2), // Auto-add first 2 unicode lines
+          // Map first 2 lines to objects {unicode, sulekh}
+          selectedLines: unicodeLines.slice(0, 2).map((uLine, idx) => ({
+            unicode: uLine,
+            sulekh: sulekhLines[idx] || uLine
+          })),
           currentDisplayedText: sulekhLines[0] || '', // Display sulekh in output
           selectedLineIndex: 0,
           originalInputText: fullKirtan.unicodeContent || '',
@@ -425,7 +455,11 @@ function MainApp({ onLogout }) {
             data: {
               allLines: unicodeLines,
               sulekhLines: sulekhLines,
-              selectedLines: unicodeLines.slice(0, 2),
+              // Map first 2 lines to objects {unicode, sulekh}
+              selectedLines: unicodeLines.slice(0, 2).map((uLine, idx) => ({
+                unicode: uLine,
+                sulekh: sulekhLines[idx] || uLine
+              })),
               currentDisplayedText: sulekhLines[0] || '',
               selectedLineIndex: 0,
               originalInputText: kirtan.unicodeContent || '',

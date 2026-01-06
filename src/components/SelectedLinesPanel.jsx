@@ -55,17 +55,23 @@ const SelectedLinesPanel = ({
                 {selectedLines.length === 0 ? (
                     <p className="panel-placeholder">Select lines to add shortcuts</p>
                 ) : (
-                    selectedLines.map((line, index) => (
+                    selectedLines.map((line, index) => {
+                      const isObject = typeof line !== 'string';
+                      const displayText = isObject ? (line.unicode || '') : line;
+                      const outputText = isObject ? (line.sulekh || line.unicode) : line;
+                      const isSelected = outputText === currentDisplayedText;
+
+                      return (
                         <div
                         key={index}
                         data-index={index}
-                        className={`selected-line-card ${currentDisplayedText === line ? 'selected' : ''}`}
+                        className={`selected-line-card ${isSelected ? 'selected' : ''}`}
                         onClick={() => {
-                            onDisplayLine(line);
+                            onDisplayLine(outputText);
                         }}
                         >
                         <div className="line-number-badge">{index + 1}</div>
-                        <div className="line-text-compact" title={line.trim()}>{line.trim()}</div>
+                        <div className="line-text-compact" title={displayText.trim()}>{displayText.trim()}</div>
                         <div
                             className="remove-btn-compact"
                             onClick={(e) => {
@@ -76,7 +82,8 @@ const SelectedLinesPanel = ({
                             ×
                         </div>
                         </div>
-                    ))
+                      );
+                    })
                 )}
             </div>
         </div>

@@ -172,7 +172,7 @@ const HeaderClean = ({
         >
           <i className="fas fa-edit"></i> Input
         </button>
-        <button 
+        {/* <button 
           style={buttonStyle} 
           onClick={onAddNewKirtan}
           onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
@@ -187,7 +187,7 @@ const HeaderClean = ({
           onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
         >
           <i className="fas fa-file-import"></i> Import
-        </button>
+        </button> */}
         <button 
           style={buttonStyle} 
           onClick={onOpenSettingsModal}

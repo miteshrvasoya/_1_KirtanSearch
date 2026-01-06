@@ -8,6 +8,11 @@ const VmixModal = ({ isOpen, onClose, onSave, settings }) => {
     const handleSave = () => {
         onSave({
             inputNumber: parseInt(localSettings.inputNumber) || 1,
+            inputName: localSettings.inputName || '',
+            inputOverlay: Math.min(4, Math.max(1, parseInt(localSettings.inputOverlay || localSettings.overlayNumber) || 1)),
+            sourceNumber: parseInt(localSettings.sourceNumber) || '',
+            sourceTitle: localSettings.sourceTitle || '',
+            sourceOverlay: Math.min(4, Math.max(1, parseInt(localSettings.sourceOverlay) || 1)),
             overlayNumber: Math.min(4, Math.max(1, parseInt(localSettings.overlayNumber) || 1)),
             ipAddress: localSettings.ipAddress || '127.0.0.1',
             port: parseInt(localSettings.port) || 8088
@@ -74,30 +79,113 @@ const VmixModal = ({ isOpen, onClose, onSave, settings }) => {
                 <h2>VMix Integration Settings</h2>
 
                 <div className="vmix-controls">
-                    <div className="vmix-group">
-                        <label htmlFor="vmixInputNumber">Input Number</label>
-                        <input
-                            type="number"
-                            id="vmixInputNumber"
-                            min="1"
-                            max="100"
-                            value={localSettings.inputNumber}
-                            onChange={(e) => setLocalSettings({ ...localSettings, inputNumber: e.target.value })}
-                            placeholder="VMix Input Number"
-                        />
+                    {/* Input Section */}
+                    <div className="vmix-group" style={{ marginBottom: '15px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Input Settings</label>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1 }}>
+                                <label htmlFor="vmixInputNumber" style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Number</label>
+                                <div style={{ display: 'flex', gap: '5px' }}>
+                                    <input
+                                        type="number"
+                                        id="vmixInputNumber"
+                                        min="1"
+                                        max="100"
+                                        value={localSettings.inputNumber}
+                                        onChange={(e) => setLocalSettings({ ...localSettings, inputNumber: e.target.value })}
+                                        placeholder="#"
+                                        style={{ flex: 1 }}
+                                    />
+                                    <button 
+                                        className="btn btn-secondary" 
+                                        style={{ padding: '4px 8px', fontSize: '11px' }}
+                                        onClick={async () => {
+                                            try {
+                                                const { ipAddress, port, inputNumber } = localSettings;
+                                                const response = await fetch(`http://${ipAddress}:${port}/api`);
+                                                const text = await response.text();
+                                                const parser = new DOMParser();
+                                                const xmlDoc = parser.parseFromString(text, "text/xml");
+                                                const input = xmlDoc.querySelector(`input[number="${inputNumber}"]`);
+                                                if (input) {
+                                                    setLocalSettings({ ...localSettings, inputName: input.textContent });
+                                                    setTestResult(`Found: ${input.textContent}`);
+                                                } else {
+                                                    setTestResult(`Input ${inputNumber} not found`);
+                                                }
+                                            } catch (e) {
+                                                setTestResult(`Error: ${e.message}`);
+                                            }
+                                        }}
+                                    >
+                                        ✓
+                                    </button>
+                                </div>
+                            </div>
+                            <div style={{ flex: 2 }}>
+                                <label htmlFor="vmixInputName" style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Name</label>
+                                <input
+                                    type="text"
+                                    id="vmixInputName"
+                                    value={localSettings.inputName || ''}
+                                    onChange={(e) => setLocalSettings({ ...localSettings, inputName: e.target.value })}
+                                    placeholder="Input Name"
+                                />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <label htmlFor="vmixInputOverlay" style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Overlay</label>
+                                <input
+                                    type="number"
+                                    id="vmixInputOverlay"
+                                    min="1"
+                                    max="4"
+                                    value={localSettings.inputOverlay || localSettings.overlayNumber || 1}
+                                    onChange={(e) => setLocalSettings({ ...localSettings, inputOverlay: e.target.value })}
+                                    placeholder="1-4"
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="vmix-group">
-                        <label htmlFor="vmixOverlayNumber">Overlay Number (1-4)</label>
-                        <input
-                            type="number"
-                            id="vmixOverlayNumber"
-                            min="1"
-                            max="4"
-                            value={localSettings.overlayNumber}
-                            onChange={(e) => setLocalSettings({ ...localSettings, overlayNumber: e.target.value })}
-                            placeholder="1-4"
-                        />
+                    {/* Source Section */}
+                    <div className="vmix-group" style={{ marginBottom: '15px' }}>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Source Settings</label>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1 }}>
+                                <label htmlFor="vmixSourceNumber" style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Number</label>
+                                <input
+                                    type="number"
+                                    id="vmixSourceNumber"
+                                    min="1"
+                                    max="100"
+                                    value={localSettings.sourceNumber || ''}
+                                    onChange={(e) => setLocalSettings({ ...localSettings, sourceNumber: e.target.value })}
+                                    placeholder="#"
+                                />
+                            </div>
+                            <div style={{ flex: 2 }}>
+                                <label htmlFor="vmixSourceTitle" style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Title</label>
+                                <input
+                                    type="text"
+                                    id="vmixSourceTitle"
+                                    value={localSettings.sourceTitle || ''}
+                                    onChange={(e) => setLocalSettings({ ...localSettings, sourceTitle: e.target.value })}
+                                    placeholder="Source Title"
+                                />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <label htmlFor="vmixSourceOverlay" style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Overlay</label>
+                                <input
+                                    type="number"
+                                    id="vmixSourceOverlay"
+                                    min="1"
+                                    max="4"
+                                    value={localSettings.sourceOverlay || ''}
+                                    onChange={(e) => setLocalSettings({ ...localSettings, sourceOverlay: e.target.value })}
+                                    placeholder="1-4"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="vmix-group">

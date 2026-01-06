@@ -82,8 +82,7 @@
 
 .shortcuts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 Columns as requested by "3*2" implies 3 rows, 2 cols? User said "3 * 2 (rows * columns)" which usually means 3 rows, 2 columns. */
-    /* If user meant 3 columns 2 rows, I should use repeat(3, 1fr). "3 * 2 (rows * columns)" -> 3 rows, 2 columns. So 2 columns is correct. */
+    grid-template-columns: 1fr; /* Single column vertical stack */
     gap: 8px;
     overflow-y: auto;
     padding-right: 5px;
@@ -135,6 +134,7 @@
 .line-text-compact {
     font-family: 'Guj_Regular_Bold_Sulekh', sans-serif;
     font-size: 13px;
+    font-weight: 600; /* Increased font weight */
     /* line-height: 1.2; */
     overflow: hidden;
     display: -webkit-box;
@@ -206,6 +206,7 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
+    font-weight: 600; /* Increased font weight */
 }
 
 .related-pad-item-compact:hover {
@@ -237,11 +238,12 @@
 }
 
 .pad-title-compact {
-    font-size: 13px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-family: 'Noto Sans Gujarati', 'Shruti', sans-serif;
+    font-weight: 600;
+    font-family: 'Guj_Regular_Bold_Sulekh', sans-serif;
+    font-size: 13px;
     color: #333;
 }
 

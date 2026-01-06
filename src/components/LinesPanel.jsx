@@ -97,7 +97,7 @@ const LinesPanel = ({
                   className="add-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onAddToSelectedLines(line);
+                    onAddToSelectedLines(index);
                     setIsInputPanelFocused(false);
                   }}
                 >
