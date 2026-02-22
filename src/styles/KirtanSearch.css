@@ -1,3 +1,44 @@
+/* === Full-Page Screen Layout === */
+.kirtan-search-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: white;
+  overflow: hidden;
+  position: relative;
+}
+
+.kirtan-search-screen .kirtan-search-header {
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+.kirtan-search-screen .kirtan-search-body {
+  flex: 1;
+  overflow: hidden;
+}
+
+.db-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.db-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* === Legacy Modal Styles === */
 .kirtan-search-modal {
   position: fixed;
   top: 0;
@@ -44,14 +85,14 @@
 
 .kirtan-search-input {
   padding: 8px 25px;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 50px;
   width: 350px;
   font-size: 14px;
   background: white;
   color: #333;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .kirtan-search-input:focus {
@@ -162,7 +203,7 @@
 }
 
 .open-kirtan-btn:hover {
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
 }
 

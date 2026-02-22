@@ -25,7 +25,7 @@ import {
   useNavigate
 } from 'react-router-dom';
 
-function MainApp({ onLogout }) {
+function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, pendingKirtanEdit, onKirtanEditHandled }) {
   // Tab management state
   const [tabs, setTabs] = useState([
     {
@@ -49,8 +49,6 @@ function MainApp({ onLogout }) {
   const [vmixModalOpen, setVmixModalOpen] = useState(false);
   const [kirtanEntryOpen, setKirtanEntryOpen] = useState(false);
   const [editingKirtan, setEditingKirtan] = useState(null);
-  const [kirtanSearchOpen, setKirtanSearchOpen] = useState(false);
-  const [databaseManagerOpen, setDatabaseManagerOpen] = useState(false);
   const [pdfImportOpen, setPdfImportOpen] = useState(false);
   const [isInputPanelFocused, setIsInputPanelFocused] = useState(true);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
@@ -58,6 +56,8 @@ function MainApp({ onLogout }) {
   const [overlayActive, setOverlayActive] = useState(false);
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
+
+  const navigate = useNavigate();
 
   // Get current tab data
   const currentTab = tabs.find(tab => tab.id === activeTabId) || tabs[0];
@@ -74,7 +74,6 @@ function MainApp({ onLogout }) {
     };
   });
 
-  // In your MainApp component
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     setVmixModalOpen(false);
@@ -152,11 +151,11 @@ function MainApp({ onLogout }) {
 
       // Open Kirtan Search on Tilde (~) or Backtick (`)
       if (e.key === '~' || e.key === '`') {
-          if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName) && !e.target.isContentEditable) {
-              e.preventDefault();
-              setKirtanSearchOpen(true);
-          }
-          return;
+        if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName) && !e.target.isContentEditable) {
+          e.preventDefault();
+          navigate('/search');
+        }
+        return;
       }
 
       if (allLines.length > 0 && isInputPanelFocused) {
@@ -174,13 +173,11 @@ function MainApp({ onLogout }) {
 
       // Fix numeric key shortcuts for selected lines (Shortcut Kadi)
       if (e.key >= '1' && e.key <= '9' && selectedLines.length > 0) {
-        // Don't trigger if typing in input fields
         if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName) && !e.target.isContentEditable) {
           e.preventDefault();
           const num = parseInt(e.key);
           if (num <= selectedLines.length) {
             const line = selectedLines[num - 1];
-            // Handle both object (new) and string (legacy) formats
             const textToDisplay = typeof line === 'string' ? line : (line.sulekh || line.unicode);
             updateCurrentTab({ currentDisplayedText: textToDisplay });
             scrollToLine(num - 1, true);
@@ -191,7 +188,7 @@ function MainApp({ onLogout }) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [allLines, selectedLines, selectedLineIndex, isInputPanelFocused, updateCurrentTab, selectLine, triggerVmixOverlay]);
+  }, [allLines, selectedLines, selectedLineIndex, isInputPanelFocused, updateCurrentTab, selectLine, triggerVmixOverlay, navigate]);
 
   // Tab management functions
   const addNewTab = () => {
@@ -225,11 +222,9 @@ function MainApp({ onLogout }) {
   };
 
   const closeTab = (tabId) => {
-    if (tabs.length === 1) return; // Don't close the last tab
-
+    if (tabs.length === 1) return;
     const newTabs = tabs.filter(tab => tab.id !== tabId);
     setTabs(newTabs);
-
     if (activeTabId === tabId) {
       setActiveTabId(newTabs[0].id);
     }
@@ -237,20 +232,12 @@ function MainApp({ onLogout }) {
 
   const processText = (text) => {
     const lines = text.split('\n').filter(line => line.trim() !== '');
-
-    // Auto-rename tab based on first line - keep it in the same format as input
     let tabName = 'Empty Tab';
     if (lines.length > 0) {
       const firstLine = lines[0];
-      // Take first few words or characters
-      if (firstLine.length > 25) {
-        tabName = firstLine.substring(0, 25) + '...';
-      } else {
-        tabName = firstLine;
-      }
+      tabName = firstLine.length > 25 ? firstLine.substring(0, 25) + '...' : firstLine;
     }
 
-    // Update tab name along with data
     setTabs(tabs.map(tab =>
       tab.id === activeTabId
         ? {
@@ -258,9 +245,8 @@ function MainApp({ onLogout }) {
           name: tabName,
           data: {
             ...tab.data,
-            ...tab.data,
             allLines: lines,
-            sulekhLines: lines, // For manual input without conversion, assume same
+            sulekhLines: lines,
             selectedLines: [],
             selectedLineIndex: lines.length > 0 ? 0 : -1,
             currentDisplayedText: lines.length > 0 ? lines[0] : '',
@@ -276,44 +262,25 @@ function MainApp({ onLogout }) {
 
   const renameTab = (tabId, newName) => {
     setTabs(tabs.map(tab =>
-      tab.id === tabId
-        ? { ...tab, name: newName }
-        : tab
+      tab.id === tabId ? { ...tab, name: newName } : tab
     ));
   };
 
-  const setCurrentDisplayedText = (text) => {
-    updateCurrentTab({ currentDisplayedText: text });
-  };
-
-  const setSelectedLines = (lines) => {
-    updateCurrentTab({ selectedLines: lines });
-  };
-
-  const setAllLines = (lines) => {
-    updateCurrentTab({ allLines: lines });
-  };
-
-  const setSelectedLineIndex = (index) => {
-    updateCurrentTab({ selectedLineIndex: index });
-  };
+  const setCurrentDisplayedText = (text) => updateCurrentTab({ currentDisplayedText: text });
+  const setSelectedLines = (lines) => updateCurrentTab({ selectedLines: lines });
+  const setAllLines = (lines) => updateCurrentTab({ allLines: lines });
+  const setSelectedLineIndex = (index) => updateCurrentTab({ selectedLineIndex: index });
 
   const addToSelectedLines = (index) => {
-    // Determine unicode and sulekh versions
     const unicodeLine = allLines[index];
     const sulekhLines = currentTab.data.sulekhLines || [];
     const sulekhLine = sulekhLines[index] || unicodeLine;
-    
-    // Check if line (unicode) already exists in selectedLines
-    // selectedLines now stores objects: { unicode: '...', sulekh: '...' }
-    const exists = selectedLines.some(line => 
+    const exists = selectedLines.some(line =>
       (typeof line === 'string' ? line : line.unicode) === unicodeLine
     );
-
     if (!exists) {
       const lineObj = { unicode: unicodeLine, sulekh: sulekhLine };
-      const newSelectedLines = [...selectedLines, lineObj];
-      updateCurrentTab({ selectedLines: newSelectedLines });
+      updateCurrentTab({ selectedLines: [...selectedLines, lineObj] });
     }
     setIsInputPanelFocused(false);
   };
@@ -347,9 +314,7 @@ function MainApp({ onLogout }) {
 
   const toggleDeleteMode = () => {
     setIsDeleteMode(!isDeleteMode);
-    if (!isDeleteMode) {
-      setLinesToDelete([]);
-    }
+    if (!isDeleteMode) setLinesToDelete([]);
   };
 
   const toggleLineForDeletion = (index) => {
@@ -374,29 +339,21 @@ function MainApp({ onLogout }) {
     }
   };
 
-  // Handle kirtan selection from search
-  const handleSelectKirtan = async (kirtan) => {
+  // Handle kirtan selection from search screen
+  const handleSelectKirtan = useCallback(async (kirtan) => {
     try {
-      // Check if a tab with this kirtan already exists
       const existingTab = tabs.find(tab =>
         tab.data.currentKirtan && tab.data.currentKirtan.id === kirtan.id
       );
-
       if (existingTab) {
-        // Switch to the existing tab
         setActiveTabId(existingTab.id);
-        setKirtanSearchOpen(false);
         return;
       }
 
-      // Fetch full kirtan details from API
       const { kirtan: fullKirtan, siblingKirtans } = await fetchKirtanDetails(kirtan.id);
-
-      // Create new tab data - use unicode for panel display
       const unicodeLines = fullKirtan.unicodeContent
         ? fullKirtan.unicodeContent.split('\n').filter(line => line.trim() !== '')
         : [];
-      
       const sulekhLines = fullKirtan.sulekhContent
         ? fullKirtan.sulekhContent.split('\n').filter(line => line.trim() !== '')
         : [];
@@ -404,14 +361,13 @@ function MainApp({ onLogout }) {
       const newTabData = {
         name: fullKirtan.unicodeTitle || fullKirtan.sulekhTitle || fullKirtan.englishTitle || `Kirtan ${nextTabId}`,
         data: {
-          allLines: unicodeLines, // Unicode for panel display
-          sulekhLines: sulekhLines, // Sulekh for output
-          // Map first 2 lines to objects {unicode, sulekh}
+          allLines: unicodeLines,
+          sulekhLines: sulekhLines,
           selectedLines: unicodeLines.slice(0, 2).map((uLine, idx) => ({
             unicode: uLine,
             sulekh: sulekhLines[idx] || uLine
           })),
-          currentDisplayedText: sulekhLines[0] || '', // Display sulekh in output
+          currentDisplayedText: sulekhLines[0] || '',
           selectedLineIndex: 0,
           originalInputText: fullKirtan.unicodeContent || '',
           currentKirtan: fullKirtan,
@@ -419,87 +375,56 @@ function MainApp({ onLogout }) {
         }
       };
 
-      // Reuse initial empty tab if applicable
       if (tabs.length === 1 && tabs[0].data.allLines.length === 0 && !tabs[0].data.currentKirtan) {
-        const updatedTab = {
-            ...tabs[0],
-            ...newTabData,
-            active: true
-        };
-        setTabs([updatedTab]);
+        setTabs([{ ...tabs[0], ...newTabData, active: true }]);
         setActiveTabId(tabs[0].id);
-        // Do not increment nextTabId as we reused the existing one
       } else {
-        const newTab = {
-            id: nextTabId,
-            active: false,
-            ...newTabData
-        };
-        setTabs([...tabs, newTab]);
+        setTabs([...tabs, { id: nextTabId, active: false, ...newTabData }]);
         setActiveTabId(nextTabId);
         setNextTabId(nextTabId + 1);
       }
-      
-      setKirtanSearchOpen(false);
     } catch (error) {
       console.error('Error loading kirtan from API:', error);
-      // Fallback to local database if API fails
       try {
         const relatedPads = await kirtanDB.getRelatedPads(kirtan.id);
-        
-        const unicodeLines = kirtan.unicodeContent ? kirtan.unicodeContent.split('\n').filter(line => line.trim() !== '') : [];
-        const sulekhLines = kirtan.sulekhContent ? kirtan.sulekhContent.split('\n').filter(line => line.trim() !== '') : [];
+        const unicodeLines = kirtan.unicodeContent ? kirtan.unicodeContent.split('\n').filter(l => l.trim()) : [];
+        const sulekhLines = kirtan.sulekhContent ? kirtan.sulekhContent.split('\n').filter(l => l.trim()) : [];
 
         const newTabData = {
-            name: kirtan.unicodeTitle || kirtan.sulekhTitle || kirtan.englishTitle || `Kirtan ${nextTabId}`,
-            data: {
-              allLines: unicodeLines,
-              sulekhLines: sulekhLines,
-              // Map first 2 lines to objects {unicode, sulekh}
-              selectedLines: unicodeLines.slice(0, 2).map((uLine, idx) => ({
-                unicode: uLine,
-                sulekh: sulekhLines[idx] || uLine
-              })),
-              currentDisplayedText: sulekhLines[0] || '',
-              selectedLineIndex: 0,
-              originalInputText: kirtan.unicodeContent || '',
-              currentKirtan: kirtan,
-              relatedPads: relatedPads
-            }
+          name: kirtan.unicodeTitle || kirtan.sulekhTitle || kirtan.englishTitle || `Kirtan ${nextTabId}`,
+          data: {
+            allLines: unicodeLines,
+            sulekhLines: sulekhLines,
+            selectedLines: unicodeLines.slice(0, 2).map((uLine, idx) => ({
+              unicode: uLine, sulekh: sulekhLines[idx] || uLine
+            })),
+            currentDisplayedText: sulekhLines[0] || '',
+            selectedLineIndex: 0,
+            originalInputText: kirtan.unicodeContent || '',
+            currentKirtan: kirtan,
+            relatedPads
+          }
         };
 
         if (tabs.length === 1 && tabs[0].data.allLines.length === 0 && !tabs[0].data.currentKirtan) {
-             const updatedTab = {
-                ...tabs[0],
-                ...newTabData,
-                active: true
-            };
-            setTabs([updatedTab]);
-            setActiveTabId(tabs[0].id);
+          setTabs([{ ...tabs[0], ...newTabData, active: true }]);
+          setActiveTabId(tabs[0].id);
         } else {
-            const newTab = {
-                id: nextTabId,
-                active: false,
-                ...newTabData
-            };
-            setTabs([...tabs, newTab]);
-            setActiveTabId(nextTabId);
-            setNextTabId(nextTabId + 1);
+          setTabs([...tabs, { id: nextTabId, active: false, ...newTabData }]);
+          setActiveTabId(nextTabId);
+          setNextTabId(nextTabId + 1);
         }
-
-        setKirtanSearchOpen(false);
       } catch (fallbackError) {
         console.error('Fallback also failed:', fallbackError);
         alert('Failed to load kirtan details. Please try again.');
       }
     }
-  };
+  }, [tabs, nextTabId]);
 
-  // Handle editing kirtan from search
+  // Handle editing kirtan (navigates back from search/db screen)
   const handleEditKirtan = (kirtan) => {
     setEditingKirtan(kirtan);
     setKirtanEntryOpen(true);
-    setKirtanSearchOpen(false);
   };
 
   // Handle adding new kirtan
@@ -516,7 +441,7 @@ function MainApp({ onLogout }) {
       setEditingKirtan(null);
       setKirtanEntryOpen(true);
     } else if (pendingAction === 'database') {
-      setDatabaseManagerOpen(true);
+      navigate('/database');
     } else if (pendingAction === 'import') {
       setPdfImportOpen(true);
     }
@@ -530,32 +455,46 @@ function MainApp({ onLogout }) {
     setPinModalOpen(true);
   };
 
+  const handleOpenKirtanSearch = () => {
+    navigate('/search');
+  };
+
   const handleOpenPDFImport = () => {
     setPendingAction('import');
     setPinModalOpen(true);
   };
+
+  // Handle pending kirtan selection from /search screen
+  useEffect(() => {
+    if (pendingKirtanSelection) {
+      handleSelectKirtan(pendingKirtanSelection);
+      if (onKirtanSelectionHandled) onKirtanSelectionHandled();
+    }
+  }, [pendingKirtanSelection]);
+
+  // Handle pending kirtan edit from /database or /search screen
+  useEffect(() => {
+    if (pendingKirtanEdit) {
+      setEditingKirtan(pendingKirtanEdit);
+      setKirtanEntryOpen(true);
+      if (onKirtanEditHandled) onKirtanEditHandled();
+    }
+  }, [pendingKirtanEdit]);
 
   // Initialize database on component mount
   useEffect(() => {
     const initDatabase = async () => {
       try {
         await kirtanDB.init();
-        // Load sample data if database is empty
         const count = await loadSampleData(kirtanDB);
-        if (count > 0) {
-          console.log(`Loaded ${count} sample kirtans`);
-        }
-
-        // Initialize Search Index immediately on load
+        if (count > 0) console.log(`Loaded ${count} sample kirtans`);
         const allKirtans = await kirtanDB.getAllKirtans();
         searchIndex.init(allKirtans);
         console.log('Search index initialized');
-
       } catch (error) {
         console.error('Database initialization error:', error);
       }
     };
-
     initDatabase();
   }, []);
 
@@ -566,7 +505,7 @@ function MainApp({ onLogout }) {
         onOpenSettingsModal={() => setSettingsModalOpen(true)}
         onOpenVmixModal={() => setVmixModalOpen(true)}
         onOpenDatabase={handleOpenDatabase}
-        onOpenKirtanSearch={() => setKirtanSearchOpen(true)}
+        onOpenKirtanSearch={handleOpenKirtanSearch}
         onAddNewKirtan={handleAddNewKirtan}
         onOpenPDFImport={handleOpenPDFImport}
         onLogout={onLogout}
@@ -617,7 +556,7 @@ function MainApp({ onLogout }) {
         isOpen={inputModalOpen}
         onClose={() => setInputModalOpen(false)}
         onProcessText={processText}
-        currentText={originalInputText} // Pass the original input text instead of currentDisplayedText
+        currentText={originalInputText}
       />
 
       <SettingsModal
@@ -640,34 +579,13 @@ function MainApp({ onLogout }) {
         onClose={(saved) => {
           setKirtanEntryOpen(false);
           setEditingKirtan(null);
-          // Refresh search if it's open
-          if (saved && kirtanSearchOpen) {
-            // Trigger refresh in KirtanSearch
-          }
         }}
-      />
-
-      <KirtanSearch
-        isOpen={kirtanSearchOpen}
-        onClose={() => setKirtanSearchOpen(false)}
-        onSelectKirtan={handleSelectKirtan}
-        onEditKirtan={handleEditKirtan}
-      />
-
-      <DatabasePage
-        isOpen={databaseManagerOpen}
-        onClose={() => setDatabaseManagerOpen(false)}
-        onEditKirtan={handleEditKirtan}
       />
 
       <PDFImport
         isOpen={pdfImportOpen}
         onClose={(saved) => {
           setPdfImportOpen(false);
-          // Refresh search if needed
-          if (saved && kirtanSearchOpen) {
-            // Trigger refresh
-          }
         }}
       />
 
@@ -695,9 +613,13 @@ function App() {
   });
   const navigate = useNavigate();
 
+  // Shared kirtan state for cross-page communication
+  const [pendingKirtanSelection, setPendingKirtanSelection] = useState(null);
+  const [pendingKirtanEdit, setPendingKirtanEdit] = useState(null);
+
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      // Don't force navigate — let the user stay on their current route
     } else {
       navigate('/login');
     }
@@ -709,7 +631,6 @@ function App() {
   };
 
   return (
-    // Remove the <Router> wrapper here
     <Routes>
       <Route
         path="/login"
@@ -721,16 +642,49 @@ function App() {
         }
       />
       <Route
+        path="/database"
+        element={
+          isAuthenticated
+            ? <DatabasePage onEditKirtan={(kirtan) => {
+              setPendingKirtanEdit(kirtan);
+              navigate('/');
+            }} />
+            : <Navigate to="/login" replace />
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          isAuthenticated
+            ? <KirtanSearch
+              onSelectKirtan={(kirtan) => {
+                setPendingKirtanSelection(kirtan);
+              }}
+              onEditKirtan={(kirtan) => {
+                setPendingKirtanEdit(kirtan);
+              }}
+            />
+            : <Navigate to="/login" replace />
+        }
+      />
+      <Route
         path="/*"
         element={
-          isAuthenticated ?
-            <MainApp onLogout={handleLogout} /> :
-            <Navigate to="/login" replace />
+          isAuthenticated
+            ? <MainApp
+              onLogout={handleLogout}
+              pendingKirtanSelection={pendingKirtanSelection}
+              onKirtanSelectionHandled={() => setPendingKirtanSelection(null)}
+              pendingKirtanEdit={pendingKirtanEdit}
+              onKirtanEditHandled={() => setPendingKirtanEdit(null)}
+            />
+            : <Navigate to="/login" replace />
         }
       />
     </Routes>
   );
 }
+
 const scrollToLine = (index, isShortcutKadi = false) => {
   setTimeout(() => {
     const selector = isShortcutKadi
@@ -738,10 +692,7 @@ const scrollToLine = (index, isShortcutKadi = false) => {
       : `.line-item:nth-child(${index + 2})`;
     const element = document.querySelector(selector);
     if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest'
-      });
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, 50);
 };

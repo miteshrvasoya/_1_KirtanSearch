@@ -1,3 +1,52 @@
+/* === Full-Page Screen Layout === */
+.database-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f4f6f9;
+  overflow: hidden;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(-2px);
+}
+
+.btn-light {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.btn-light:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* === Legacy Modal Styles (kept for backward compat) === */
 .database-manager-modal {
   position: fixed;
   top: 0;
