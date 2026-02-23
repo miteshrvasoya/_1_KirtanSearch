@@ -24,6 +24,17 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
     loadKirtans();
   }, []);
 
+  // Close search screen on Escape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        navigate('/');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
+
   const loadKirtans = useCallback(async () => {
     setLoading(true);
     try {

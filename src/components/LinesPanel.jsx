@@ -3,6 +3,8 @@ import '../styles/LinesPanel.css';
 
 const LinesPanel = ({
   allLines,
+  sulekhLines,
+  currentDisplayedText,
   selectedLineIndex,
   isDeleteMode,
   linesToDelete,
@@ -72,40 +74,50 @@ const LinesPanel = ({
         {allLines.length === 0 ? (
           <p className="panel-placeholder">Process text to see lines here</p>
         ) : (
-          allLines.map((line, index) => (
-            <div
-              key={index}
-              data-index={index}
-              className={`line-item ${selectedLineIndex === index ? 'selected' : ''}`}
-              onClick={() => !isDeleteMode && onSelectLine(index)}
-            >
-              {isDeleteMode && (
-                <input
-                  type="checkbox"
-                  className="line-checkbox"
-                  checked={linesToDelete.includes(index)}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    onToggleLineForDeletion(index);
-                  }}
-                />
-              )}
-              <span className="line-index">{index + 1}.</span>
-              <div className="line-text">{line.trim()}</div>
-              {!isDeleteMode && (
-                <div
-                  className="add-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddToSelectedLines(index);
-                    setIsInputPanelFocused(false);
-                  }}
-                >
-                  +
-                </div>
-              )}
-            </div>
-          ))
+          allLines.map((line, index) => {
+            // Matches Output Area if unicode OR sulekh version is currently displayed
+            const sulekhLine = (sulekhLines && sulekhLines[index]) || line;
+            const isOutputLine = currentDisplayedText && (
+              line.trim() === currentDisplayedText.trim() ||
+              sulekhLine.trim() === currentDisplayedText.trim()
+            );
+            const isNavSelected = selectedLineIndex === index;
+
+            return (
+              <div
+                key={index}
+                data-index={index}
+                className={`line-item ${isOutputLine ? 'output-active' : (isNavSelected ? 'selected' : '')}`}
+                onClick={() => !isDeleteMode && onSelectLine(index)}
+              >
+                {isDeleteMode && (
+                  <input
+                    type="checkbox"
+                    className="line-checkbox"
+                    checked={linesToDelete.includes(index)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      onToggleLineForDeletion(index);
+                    }}
+                  />
+                )}
+                <span className="line-index">{index + 1}.</span>
+                <div className="line-text">{line.trim()}</div>
+                {!isDeleteMode && (
+                  <div
+                    className="add-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddToSelectedLines(index);
+                      setIsInputPanelFocused(false);
+                    }}
+                  >
+                    +
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
 
         {isDeleteMode && linesToDelete.length > 0 && (
@@ -115,7 +127,7 @@ const LinesPanel = ({
               onClick={(e) => {
                 e.stopPropagation();
                 if (window.confirm(`Are you sure you want to delete ${linesToDelete.length} selected line(s)?`)) {
-                    onDeleteSelectedLines();
+                  onDeleteSelectedLines();
                 }
               }}
             >
