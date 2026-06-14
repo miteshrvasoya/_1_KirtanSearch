@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import kirtanDB from '../utils/database';
 import { updateKirtan, searchKirtans } from '../utils/kirtanApi';
+import { getKirtanTitle } from '../utils/kirtanDisplay';
 import '../styles/DatabaseManager.css';
 import KirtanEntryEnhanced from './KirtanEntryEnhanced';
 
@@ -349,7 +350,7 @@ const DatabasePage = ({ onEditKirtan }) => {
               ) : (
                 filteredKirtans.map(k => (
                   <tr key={k.id}>
-                    <td className="gujarati-text">{k.unicodeTitle || k.sulekhTitle}</td>
+                    <td className="gujarati-text">{getKirtanTitle(k)}</td>
                     <td>{k.englishTitle}</td>
                     <td>{k.creator}</td>
                     <td>{k.bookName || k.englishBookName}</td>

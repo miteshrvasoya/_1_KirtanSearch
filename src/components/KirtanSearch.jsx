@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import kirtanDB from '../utils/database';
 import searchIndex from '../utils/SearchIndex';
 import { searchKirtans } from '../utils/kirtanApi';
+import { getKirtanDisplayData, getKirtanTitle } from '../utils/kirtanDisplay';
 import '../styles/KirtanSearch.css';
 
 const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
@@ -62,16 +63,6 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigate]);
-
-  const isGujarati = (text) => {
-    const gujaratiRange = /[\u0A80-\u0AFF]/;
-    return gujaratiRange.test(text);
-  };
-
-  const isHindi = (text) => {
-    const devanagariRange = /[\u0900-\u097F]/;
-    return devanagariRange.test(text);
-  };
 
   // Search effect with debounce
   useEffect(() => {
@@ -136,7 +127,10 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
     navigate('/');
   };
 
-  const getFontFamily = (type) => {
+  const getFontFamily = (type, kirtan = null) => {
+    if (kirtan && getKirtanDisplayData(kirtan).isHindiKirtan) {
+      return "'Noto Sans Devanagari', 'Mangal', sans-serif";
+    }
     if (type === 'sulekh') return "'Guj_Regular_Bold_Sulekh', sans-serif";
     return "'Noto Sans Gujarati', 'Shruti', 'Arial', sans-serif";
   };
@@ -203,18 +197,17 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
               </div>
             ) : (
               <>
-                {titleMatches.slice(0, visibleTitleCount).map(kirtan => (
+                {titleMatches.slice(0, visibleTitleCount).map(kirtan => {
+                  const title = getKirtanTitle(kirtan);
+                  return (
                   <div
                     key={kirtan.id}
                     className={`kirtan-item ${selectedKirtan?.id === kirtan.id ? 'selected' : ''}`}
                     onClick={() => setSelectedKirtan(kirtan)}
                     onDoubleClick={() => handleOpenKirtan(kirtan)}
                   >
-                    <div className="kirtan-title" style={{ fontFamily: getFontFamily('unicode') }}>
-                      {isHindi(searchQuery)
-                        ? highlightMatch(kirtan.hindiTitle, searchQuery, true)
-                        : highlightMatch(kirtan.unicodeTitle || kirtan.englishTitle, searchQuery, isGujarati(searchQuery))
-                      }
+                    <div className="kirtan-title" style={{ fontFamily: getFontFamily('unicode', kirtan) }}>
+                      {highlightMatch(title, searchQuery, !!searchQuery.trim())}
                     </div>
                     {kirtan.englishTitle && (
                       <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
@@ -222,7 +215,8 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
                 {visibleTitleCount < titleMatches.length && (
                   <div className="loading-more">Scroll for more...</div>
                 )}
@@ -246,7 +240,9 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
               </div>
             ) : (
               <>
-                {contentMatches.slice(0, visibleContentCount).map((kirtan, index) => (
+                {contentMatches.slice(0, visibleContentCount).map((kirtan, index) => {
+                  const title = getKirtanTitle(kirtan);
+                  return (
                   <div
                     key={`${kirtan.id}-${index}`}
                     className={`matching-line-item ${selectedKirtan?.id === kirtan.id ? 'selected' : ''}`}
@@ -254,11 +250,8 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
                     onDoubleClick={() => handleOpenKirtan(kirtan)}
                   >
                     <div className="matching-line-content-wrapper">
-                      <div className="line-kirtan-title" style={{ fontFamily: getFontFamily('unicode') }}>
-                        {isHindi(searchQuery)
-                          ? highlightMatch(kirtan.hindiTitle, searchQuery, true)
-                          : highlightMatch(kirtan.unicodeTitle || kirtan.englishTitle, searchQuery, isGujarati(searchQuery))
-                        }
+                      <div className="line-kirtan-title" style={{ fontFamily: getFontFamily('unicode', kirtan) }}>
+                        {highlightMatch(title, searchQuery, !!searchQuery.trim())}
                       </div>
                       <div className="line-content">
                         {kirtan.creator && <span>{kirtan.creator}</span>}
@@ -267,7 +260,8 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 {visibleContentCount < contentMatches.length && (
                   <div className="loading-more">Scroll for more...</div>
                 )}
@@ -278,10 +272,15 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
       </div>
 
       {/* Selected Kirtan Preview (Bottom Panel) */}
-      {selectedKirtan && (
+      {selectedKirtan && (() => {
+        const { originalInputText, isHindiKirtan } = getKirtanDisplayData(selectedKirtan);
+        const previewFont = isHindiKirtan
+          ? getFontFamily('unicode', selectedKirtan)
+          : getFontFamily('sulekh', selectedKirtan);
+        return (
         <div className="kirtan-preview">
           <div className="preview-header">
-            <h4>{selectedKirtan.unicodeTitle || selectedKirtan.sulekhTitle || selectedKirtan.englishTitle || 'Untitled'}</h4>
+            <h4>{getKirtanTitle(selectedKirtan)}</h4>
             <div className="preview-actions">
               <button onClick={() => handleEditKirtan(selectedKirtan)}>
                 <i className="fas fa-edit"></i> Edit
@@ -297,11 +296,12 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
               </button>
             </div>
           </div>
-          <div className="preview-content" style={{ fontFamily: getFontFamily('sulekh') }}>
-            {selectedKirtan.sulekhContent || selectedKirtan.unicodeContent || 'No content available'}
+          <div className="preview-content" style={{ fontFamily: previewFont }}>
+            {originalInputText || 'No content available'}
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

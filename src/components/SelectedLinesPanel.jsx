@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { getKirtanTitle } from '../utils/kirtanDisplay';
 import '../styles/SelectedLinesPanel.css';
 
 const SelectedLinesPanel = ({
@@ -114,7 +115,7 @@ const SelectedLinesPanel = ({
                   </div>
                   <div className="pad-info">
                     <div className="pad-title-compact">
-                      {pad.unicodeTitle || pad.sulekhTitle || 'Untitled'}
+                      {getKirtanTitle(pad)}
                     </div>
                   </div>
                 </div>

@@ -17,6 +17,7 @@ import kirtanDB from './utils/database';
 import searchIndex from './utils/SearchIndex';
 import { loadSampleData } from './utils/sampleData';
 import { fetchKirtanDetails } from './utils/kirtanApi';
+import { getKirtanDisplayData, buildInitialSelectedLines } from './utils/kirtanDisplay';
 import './styles/App.css';
 import {
   Routes,
@@ -344,42 +345,23 @@ function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, p
 
       const { kirtan: fullKirtan, siblingKirtans } = await fetchKirtanDetails(kirtan.id);
 
-      const hindiLines = fullKirtan.hindiContent
-        ? fullKirtan.hindiContent.split('\n').filter(line => line.trim() !== '')
-        : [];
-      const unicodeLines = fullKirtan.unicodeContent
-        ? fullKirtan.unicodeContent.split('\n').filter(line => line.trim() !== '')
-        : [];
-      const sulekhLines = fullKirtan.sulekhContent
-        ? fullKirtan.sulekhContent.split('\n').filter(line => line.trim() !== '')
-        : [];
-
-      // Hindi kirtan: has both hindiTitle AND hindiContent (even if gujarati/sulekh also present)
-      const isHindiKirtan = !!(fullKirtan.hindiTitle && hindiLines.length > 0);
-
-      // allLines = original script lines for the Lines Panel display
-      const displayLines = isHindiKirtan ? hindiLines : (unicodeLines.length > 0 ? unicodeLines : hindiLines);
-
-      // outputLines = what goes into the Output Area
-      const outputLines = isHindiKirtan
-        ? hindiLines
-        : (sulekhLines.length > 0 ? sulekhLines : unicodeLines);
+      const {
+        displayLines,
+        outputLines,
+        title,
+        originalInputText,
+        hindiLines
+      } = getKirtanDisplayData(fullKirtan);
 
       const newTabData = {
-        name: fullKirtan.unicodeTitle || fullKirtan.hindiTitle || fullKirtan.sulekhTitle || fullKirtan.englishTitle || `Kirtan ${nextTabId}`,
+        name: title || `Kirtan ${nextTabId}`,
         data: {
           allLines: displayLines,
           sulekhLines: outputLines,
-          selectedLines: displayLines.slice(0, 2).map((dLine, idx) => ({
-            unicode: dLine,
-            sulekh: outputLines[idx] || dLine,
-            hindi: hindiLines[idx] || ''
-          })),
+          selectedLines: buildInitialSelectedLines(displayLines, outputLines, hindiLines),
           currentDisplayedText: outputLines[0] || '',
           selectedLineIndex: 0,
-          originalInputText: isHindiKirtan
-            ? (fullKirtan.hindiContent || '')
-            : (fullKirtan.unicodeContent || ''),
+          originalInputText,
           currentKirtan: fullKirtan,
           relatedPads: siblingKirtans
         }
@@ -398,29 +380,23 @@ function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, p
       try {
         const relatedPads = await kirtanDB.getRelatedPads(kirtan.id);
 
-        const hindiLines = kirtan.hindiContent ? kirtan.hindiContent.split('\n').filter(l => l.trim()) : [];
-        const unicodeLines = kirtan.unicodeContent ? kirtan.unicodeContent.split('\n').filter(l => l.trim()) : [];
-        const sulekhLines = kirtan.sulekhContent ? kirtan.sulekhContent.split('\n').filter(l => l.trim()) : [];
-
-        const isHindiKirtan = !!(kirtan.hindiTitle && hindiLines.length > 0);
-        const displayLines = isHindiKirtan ? hindiLines : (unicodeLines.length > 0 ? unicodeLines : hindiLines);
-        const outputLines = isHindiKirtan
-          ? hindiLines
-          : (sulekhLines.length > 0 ? sulekhLines : unicodeLines);
+        const {
+          displayLines,
+          outputLines,
+          title,
+          originalInputText,
+          hindiLines
+        } = getKirtanDisplayData(kirtan);
 
         const newTabData = {
-          name: kirtan.unicodeTitle || kirtan.hindiTitle || kirtan.sulekhTitle || kirtan.englishTitle || `Kirtan ${nextTabId}`,
+          name: title || `Kirtan ${nextTabId}`,
           data: {
             allLines: displayLines,
             sulekhLines: outputLines,
-            selectedLines: displayLines.slice(0, 2).map((dLine, idx) => ({
-              unicode: dLine,
-              sulekh: outputLines[idx] || dLine,
-              hindi: hindiLines[idx] || ''
-            })),
+            selectedLines: buildInitialSelectedLines(displayLines, outputLines, hindiLines),
             currentDisplayedText: outputLines[0] || '',
             selectedLineIndex: 0,
-            originalInputText: isHindiKirtan ? (kirtan.hindiContent || '') : (kirtan.unicodeContent || ''),
+            originalInputText,
             currentKirtan: kirtan,
             relatedPads
           }
