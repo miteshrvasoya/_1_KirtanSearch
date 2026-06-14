@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { enhancedSulekhToUnicode, enhancedSulekhToGujlish, extractFirstLine, gujUnicodeToHindi } from '../utils/enhancedConverter';
-import kirtanDB from '../utils/database';
 import { master_json_data } from '../utils/master_data';
 import '../styles/KirtanEntryEnhanced.css';
 

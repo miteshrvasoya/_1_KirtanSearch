@@ -74,13 +74,6 @@ function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, p
     };
   });
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    setVmixModalOpen(false);
-    setSettingsModalOpen(false);
-    setInputModalOpen(false);
-  };
-
   const [editorSettings, setEditorSettings] = useState(() => {
     const savedSettings = localStorage.getItem('editorSettings');
     return savedSettings ? JSON.parse(savedSettings) : {
@@ -267,7 +260,6 @@ function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, p
   };
 
   const setCurrentDisplayedText = (text) => updateCurrentTab({ currentDisplayedText: text });
-  const setSelectedLines = (lines) => updateCurrentTab({ selectedLines: lines });
   const setAllLines = (lines) => updateCurrentTab({ allLines: lines });
   const setSelectedLineIndex = (index) => updateCurrentTab({ selectedLineIndex: index });
 
@@ -449,12 +441,6 @@ function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, p
     }
   }, [tabs, nextTabId]);
 
-  // Handle editing kirtan (navigates back from search/db screen)
-  const handleEditKirtan = (kirtan) => {
-    setEditingKirtan(kirtan);
-    setKirtanEntryOpen(true);
-  };
-
   // Handle adding new kirtan
   const handleAddNewKirtan = () => {
     setPendingAction('addKirtan');
@@ -498,7 +484,7 @@ function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, p
       handleSelectKirtan(pendingKirtanSelection);
       if (onKirtanSelectionHandled) onKirtanSelectionHandled();
     }
-  }, [pendingKirtanSelection]);
+  }, [pendingKirtanSelection, handleSelectKirtan, onKirtanSelectionHandled]);
 
   // Handle pending kirtan edit from /database or /search screen
   useEffect(() => {
@@ -507,7 +493,7 @@ function MainApp({ onLogout, pendingKirtanSelection, onKirtanSelectionHandled, p
       setKirtanEntryOpen(true);
       if (onKirtanEditHandled) onKirtanEditHandled();
     }
-  }, [pendingKirtanEdit]);
+  }, [pendingKirtanEdit, onKirtanEditHandled]);
 
   // Initialize database on component mount
   useEffect(() => {
@@ -647,6 +633,9 @@ function App() {
   const [pendingKirtanSelection, setPendingKirtanSelection] = useState(null);
   const [pendingKirtanEdit, setPendingKirtanEdit] = useState(null);
 
+  const handleKirtanSelectionHandled = useCallback(() => setPendingKirtanSelection(null), []);
+  const handleKirtanEditHandled = useCallback(() => setPendingKirtanEdit(null), []);
+
   useEffect(() => {
     if (isAuthenticated) {
       // Don't force navigate — let the user stay on their current route
@@ -704,9 +693,9 @@ function App() {
             ? <MainApp
               onLogout={handleLogout}
               pendingKirtanSelection={pendingKirtanSelection}
-              onKirtanSelectionHandled={() => setPendingKirtanSelection(null)}
+              onKirtanSelectionHandled={handleKirtanSelectionHandled}
               pendingKirtanEdit={pendingKirtanEdit}
-              onKirtanEditHandled={() => setPendingKirtanEdit(null)}
+              onKirtanEditHandled={handleKirtanEditHandled}
             />
             : <Navigate to="/login" replace />
         }
