@@ -34,9 +34,6 @@ const SelectedLinesPanel = ({
     }
   }, [currentDisplayedText, selectedLines]);
 
-  // Determine what to show: manual selection or related pads
-  const showRelatedPads = currentKirtan && relatedPads.length > 0 && selectedLines.length === 0;
-
   return (
     <div className="display-panel">
       {/* Fixed Header */}

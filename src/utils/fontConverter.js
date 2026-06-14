@@ -35,7 +35,7 @@ export const convertUnicodeToSulekh = (text) => {
   modifiedText = modifiedText.replace(/([કખગઘઙચછજઝઞટઠડઢણતથદધનપફબભમયરલવશષ���હળ])(્)([iã])/g, "$3$1$2");
   
   // Halanta handling
-  modifiedText = modifiedText.replace(/[્]([ \,\;\.।\n\-\:])/g, "z$1");
+  modifiedText = modifiedText.replace(/[્]([ ,;.।\n-:])/g, "z$1");
   
   // Main conversion mapping
   const conversionMap = [

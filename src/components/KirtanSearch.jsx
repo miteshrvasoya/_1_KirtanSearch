@@ -19,22 +19,6 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
   const [visibleContentCount, setVisibleContentCount] = useState(30);
   const ITEMS_PER_PAGE = 30;
 
-  // Load all kirtans on mount
-  useEffect(() => {
-    loadKirtans();
-  }, []);
-
-  // Close search screen on Escape
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        navigate('/');
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate]);
-
   const loadKirtans = useCallback(async () => {
     setLoading(true);
     try {
@@ -62,6 +46,22 @@ const KirtanSearch = ({ onSelectKirtan, onEditKirtan }) => {
       setLoading(false);
     }
   }, []);
+
+  // Load all kirtans on mount
+  useEffect(() => {
+    loadKirtans();
+  }, [loadKirtans]);
+
+  // Close search screen on Escape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        navigate('/');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
 
   const isGujarati = (text) => {
     const gujaratiRange = /[\u0A80-\u0AFF]/;

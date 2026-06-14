@@ -1,8 +1,73 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { enhancedSulekhToUnicode, enhancedSulekhToGujlish, extractFirstLine } from '../utils/enhancedConverter';
+import { enhancedSulekhToUnicode, enhancedSulekhToGujlish } from '../utils/enhancedConverter';
 import kirtanDB from '../utils/database';
 import '../styles/PDFImport.css';
+
+// Pattern to identify kirtan titles (numbers followed by text)
+const kirtanTitlePattern = /^[૦-૯0-9]+[\s.)-]*(.+)$/;
+const englishNumberPattern = /^[0-9]+[\s.)-]*(.+)$/;
+
+// Function to extract kirtans from text
+const extractKirtansFromText = (text) => {
+  const lines = text.split('\n');
+  const kirtans = [];
+  let currentKirtan = null;
+  let kirtanNumber = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Skip empty lines
+    if (!line) {
+      if (currentKirtan && currentKirtan.content.trim()) {
+        currentKirtan.content += '\n';
+      }
+      continue;
+    }
+
+    // Check if this line is a kirtan title (starts with number)
+    const isTitle = englishNumberPattern.test(line) || kirtanTitlePattern.test(line);
+
+    if (isTitle) {
+      // Save previous kirtan if exists
+      if (currentKirtan && currentKirtan.content.trim()) {
+        kirtans.push(currentKirtan);
+      }
+
+      // Start new kirtan
+      kirtanNumber++;
+      const titleMatch = line.match(englishNumberPattern) || line.match(kirtanTitlePattern);
+      const title = titleMatch ? titleMatch[1].trim() : line;
+
+      currentKirtan = {
+        id: `kirtan_${kirtanNumber}`,
+        number: kirtanNumber,
+        sulekhTitle: title,
+        unicodeTitle: enhancedSulekhToUnicode(title),
+        gujlishTitle: enhancedSulekhToGujlish(title),
+        content: '',
+        selected: true
+      };
+    } else if (currentKirtan) {
+      // Add line to current kirtan content
+      currentKirtan.content += line + '\n';
+    }
+  }
+
+  // Save last kirtan
+  if (currentKirtan && currentKirtan.content.trim()) {
+    kirtans.push(currentKirtan);
+  }
+
+  // Process content for each kirtan
+  return kirtans.map(kirtan => ({
+    ...kirtan,
+    sulekhContent: kirtan.content.trim(),
+    unicodeContent: enhancedSulekhToUnicode(kirtan.content.trim()),
+    gujlishContent: enhancedSulekhToGujlish(kirtan.content.trim())
+  }));
+};
 
 const PDFImport = ({ isOpen, onClose }) => {
   const [processing, setProcessing] = useState(false);
@@ -10,71 +75,6 @@ const PDFImport = ({ isOpen, onClose }) => {
   const [extractedKirtans, setExtractedKirtans] = useState([]);
   const [selectedKirtans, setSelectedKirtans] = useState([]);
   const [importStatus, setImportStatus] = useState('');
-
-  // Pattern to identify kirtan titles (numbers followed by text)
-  const kirtanTitlePattern = /^[૦-૯0-9]+[\s\.\-\)]*(.+)$/;
-  const englishNumberPattern = /^[0-9]+[\s\.\-\)]*(.+)$/;
-  
-  // Function to extract kirtans from text
-  const extractKirtansFromText = (text) => {
-    const lines = text.split('\n');
-    const kirtans = [];
-    let currentKirtan = null;
-    let kirtanNumber = 0;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      
-      // Skip empty lines
-      if (!line) {
-        if (currentKirtan && currentKirtan.content.trim()) {
-          currentKirtan.content += '\n';
-        }
-        continue;
-      }
-
-      // Check if this line is a kirtan title (starts with number)
-      const isTitle = englishNumberPattern.test(line) || kirtanTitlePattern.test(line);
-      
-      if (isTitle) {
-        // Save previous kirtan if exists
-        if (currentKirtan && currentKirtan.content.trim()) {
-          kirtans.push(currentKirtan);
-        }
-        
-        // Start new kirtan
-        kirtanNumber++;
-        const titleMatch = line.match(englishNumberPattern) || line.match(kirtanTitlePattern);
-        const title = titleMatch ? titleMatch[1].trim() : line;
-        
-        currentKirtan = {
-          id: `kirtan_${kirtanNumber}`,
-          number: kirtanNumber,
-          sulekhTitle: title,
-          unicodeTitle: enhancedSulekhToUnicode(title),
-          gujlishTitle: enhancedSulekhToGujlish(title),
-          content: '',
-          selected: true
-        };
-      } else if (currentKirtan) {
-        // Add line to current kirtan content
-        currentKirtan.content += line + '\n';
-      }
-    }
-    
-    // Save last kirtan
-    if (currentKirtan && currentKirtan.content.trim()) {
-      kirtans.push(currentKirtan);
-    }
-    
-    // Process content for each kirtan
-    return kirtans.map(kirtan => ({
-      ...kirtan,
-      sulekhContent: kirtan.content.trim(),
-      unicodeContent: enhancedSulekhToUnicode(kirtan.content.trim()),
-      gujlishContent: enhancedSulekhToGujlish(kirtan.content.trim())
-    }));
-  };
 
   // Handle file drop
   const onDrop = useCallback(async (acceptedFiles) => {
