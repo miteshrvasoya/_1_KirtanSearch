@@ -20,6 +20,7 @@ const Login = ({ onLogin }) => {
       'bhajanbaugsurat': 'Bhajanbaug*96012$',
       'avtaribaugnavsari': 'Avtaribaug&12069$',
       'jayswaminarayan': 'rajikarvache',
+      'videsh_zone': 'Smaran@2081',
     };
     return users[username] === password;
   };
@@ -35,24 +36,24 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!formData.username || !formData.password) {
       setError('Please enter both username and password');
       return;
     }
 
     setIsLoading(true);
-    
+
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     if (validateUser(formData.username, formData.password)) {
       onLogin(true);
       navigate('/');
     } else {
       setError('Invalid username or password');
     }
-    
+
     setIsLoading(false);
   };
 
@@ -70,7 +71,7 @@ const Login = ({ onLogin }) => {
           <p>Sign in to continue</p>
           {error && <div className="error-message">{error}</div>}
         </div>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="username">Username</label>
@@ -85,7 +86,7 @@ const Login = ({ onLogin }) => {
               required
             />
           </div>
-          
+
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <input
@@ -99,16 +100,16 @@ const Login = ({ onLogin }) => {
               required
             />
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="login-button"
             disabled={isLoading}
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
-        
+
         <div className="login-footer">
           <p>Contact admin at +91 7778932326 for access</p>
         </div>
